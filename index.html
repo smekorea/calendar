@@ -805,12 +805,15 @@ async function delTodo(id){
 })();
 </script>
 <script>
+// 서비스워커가 옛 버전을 캐싱하는 문제로 인해 제거.
+// 이미 등록된 서비스워커가 있다면 자동으로 해제합니다.
 if("serviceWorker" in navigator){
-  window.addEventListener("load",()=>{
-    navigator.serviceWorker.register("/calendar/sw.js")
-      .then(r=>console.log("SW 등록:",r.scope))
-      .catch(e=>console.warn("SW 실패:",e));
+  navigator.serviceWorker.getRegistrations().then(regs=>{
+    regs.forEach(r=>r.unregister());
   });
+  if(window.caches){
+    caches.keys().then(keys=>keys.forEach(k=>caches.delete(k)));
+  }
 }
 </script>
 </body>
