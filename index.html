@@ -195,27 +195,60 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
 .dp-item-btn.del:hover{color:#E24B4A;border-color:#fbbaba;}
 .dp-empty{text-align:center;color:var(--text3);padding:30px 0;font-size:13px;}
 
-/* ── 할 일 ── */
+/* ── 할 일 (업무 태스크 관리) ── */
 .todo-panel{padding:12px 16px 80px;}
-.todo-input-row{display:flex;gap:6px;margin-bottom:12px;}
-.todo-input-row input{flex:1;min-width:0;border:1px solid var(--border);border-radius:8px;
-  padding:0 11px;height:40px;font-size:var(--fs-base);background:var(--app-bg);color:var(--text1);font-family:inherit;}
-.cat-sel{border:1px solid var(--border);border-radius:8px;padding:0 6px;height:40px;
+.todo-add-box{border:1.5px solid var(--border);border-radius:10px;padding:12px;margin-bottom:14px;background:var(--surface);}
+.todo-add-row{display:flex;gap:6px;margin-bottom:7px;flex-wrap:wrap;}
+.todo-add-row input[type=text]{flex:1;min-width:140px;border:1px solid var(--border);border-radius:8px;
+  padding:0 11px;height:38px;font-size:var(--fs-base);background:var(--app-bg);color:var(--text1);font-family:inherit;}
+.todo-add-row input[type=date]{border:1px solid var(--border);border-radius:8px;
+  padding:0 8px;height:38px;font-size:13px;background:var(--app-bg);color:var(--text1);font-family:inherit;}
+.cat-sel,.pri-sel,.status-sel{border:1px solid var(--border);border-radius:8px;padding:0 8px;height:38px;
   font-size:13px;background:var(--app-bg);color:var(--text1);font-family:inherit;flex-shrink:0;}
-.add-todo-btn{border:none;border-radius:8px;width:40px;height:40px;background:var(--accent);
-  color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.todo-add-row textarea{width:100%;border:1px solid var(--border);border-radius:8px;
+  padding:8px 11px;font-size:13px;background:var(--app-bg);color:var(--text1);font-family:inherit;
+  resize:none;height:44px;margin-bottom:7px;}
+.add-todo-btn{border:none;border-radius:8px;height:38px;padding:0 16px;background:var(--accent);
+  color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;font-size:13px;font-family:inherit;flex-shrink:0;}
 .add-todo-btn:hover{background:var(--accent2);}
-.todo-list{display:flex;flex-direction:column;gap:7px;}
-.todo-item{display:flex;align-items:center;gap:9px;padding:11px;
-  border:1px solid var(--border);border-radius:9px;background:var(--app-bg);min-height:48px;}
-.todo-check{width:22px;height:22px;border:1.5px solid var(--border);border-radius:50%;
-  cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
-.todo-check.done{background:var(--accent);border-color:var(--accent);color:#fff;}
-.todo-text{flex:1;font-size:var(--fs-base);color:var(--text1);min-width:0;overflow:hidden;text-overflow:ellipsis;}
-.todo-text.done{text-decoration:line-through;color:var(--text3);}
-.todo-del{background:none;border:none;cursor:pointer;color:var(--text3);
-  width:32px;height:32px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.todo-del:hover{color:#E24B4A;}
+
+.todo-table-wrap{border:1.5px solid var(--border);border-radius:10px;overflow:auto;}
+.todo-table{width:100%;border-collapse:collapse;min-width:680px;}
+.todo-table th{text-align:left;font-size:11px;color:#fff;font-weight:700;
+  padding:9px 10px;background:#2c3e50;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;
+  border-right:1px solid rgba(255,255,255,.12);}
+.todo-table th:last-child{border-right:none;}
+.todo-table td{padding:10px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);
+  font-size:var(--fs-sm);color:var(--text1);vertical-align:top;}
+.todo-table td:last-child{border-right:none;}
+.todo-table tr:last-child td{border-bottom:none;}
+.todo-table tr.done-row td{color:var(--text3);}
+.todo-table tr.done-row .tt-title{text-decoration:line-through;}
+.todo-table tr:hover td{background:#f7faff;}
+.tt-check{width:20px;height:20px;border:1.5px solid var(--border);border-radius:50%;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.tt-check.done{background:var(--accent);border-color:var(--accent);color:#fff;}
+.tt-title{font-weight:700;color:#111;max-width:180px;}
+.tt-memo{color:var(--text2);max-width:200px;}
+.tt-cat-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;
+  padding:3px 9px;border-radius:12px;font-weight:700;border:1.5px solid transparent;white-space:nowrap;}
+.tt-pri{font-size:11px;font-weight:700;padding:3px 9px;border-radius:12px;white-space:nowrap;}
+.tt-pri-high{background:#FFE3E3;color:#C42B2B;}
+.tt-pri-mid{background:#FFF3D6;color:#A5760A;}
+.tt-pri-low{background:#E9ECEF;color:#555;}
+.tt-status{font-size:11px;font-weight:700;padding:3px 9px;border-radius:12px;white-space:nowrap;}
+.tt-status-todo{background:#EDEDED;color:#555;}
+.tt-status-progress{background:#DCEBFF;color:#185FA5;}
+.tt-status-done{background:#DDF0DD;color:#2E7D32;}
+.tt-due{white-space:nowrap;font-weight:600;}
+.tt-due.overdue{color:#E24B4A;}
+.tt-due.soon{color:#D4860A;}
+.tt-actions{white-space:nowrap;}
+.tt-action-btn{background:none;border:1px solid var(--border);border-radius:6px;
+  width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--text2);font-size:12px;margin-right:4px;}
+.tt-action-btn:hover{background:var(--surface);}
+.tt-action-btn.del:hover{color:#E24B4A;border-color:#fbbaba;}
 .section-title{font-size:11px;font-weight:700;color:var(--text2);margin-bottom:10px;
   text-transform:uppercase;letter-spacing:.5px;}
 
@@ -334,16 +367,33 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
 
   <div id="todo-view" style="display:none;">
     <div class="todo-panel">
-      <div class="section-title">할 일 목록</div>
-      <div class="todo-input-row">
-        <input id="todo-input" placeholder="새 할 일 입력..." onkeydown="if(event.key==='Enter')addTodo()">
-        <select class="cat-sel" id="todo-cat">
-          <option value="0">개인</option><option value="1">업무</option>
-          <option value="2">건강</option><option value="3">기타</option>
-        </select>
-        <button class="add-todo-btn" onclick="addTodo()"><i class="ti ti-plus"></i></button>
+      <div class="section-title">할 일 추가</div>
+      <div class="todo-add-box">
+        <div class="todo-add-row">
+          <input type="text" id="todo-input" placeholder="할 일 제목...">
+          <select class="cat-sel" id="todo-cat">
+            <option value="0">개인</option><option value="1">업무</option>
+            <option value="2">건강</option><option value="3">기타</option>
+          </select>
+        </div>
+        <div class="todo-add-row">
+          <input type="date" id="todo-due" title="마감일">
+          <select class="pri-sel" id="todo-pri">
+            <option value="2">우선도: 하</option>
+            <option value="1" selected>우선도: 중</option>
+            <option value="0">우선도: 상</option>
+          </select>
+          <select class="status-sel" id="todo-status">
+            <option value="todo" selected>예정</option>
+            <option value="progress">진행중</option>
+            <option value="done">완료</option>
+          </select>
+        </div>
+        <textarea id="todo-memo" placeholder="메모 (선택, 자세한 내용 작성 가능)"></textarea>
+        <button class="add-todo-btn" onclick="addTodo()" style="width:100%;"><i class="ti ti-plus"></i> 할 일 추가</button>
       </div>
-      <div class="todo-list" id="todo-list"></div>
+      <div class="section-title">할 일 목록</div>
+      <div id="todo-list"></div>
     </div>
   </div>
 </div>
@@ -481,7 +531,7 @@ async function loadFromSb(){
     const {data:td,error:tdErr}=await SB.from('cal_todos').select('*').order('created_at',{ascending:false});
     if(evErr||tdErr) console.warn('[SB] load error:',evErr,tdErr);
     if(ev) events=ev.map(r=>({id:r.id,title:r.title,date:r.date,cat:r.cat,memo:r.memo||''}));
-    if(td) todos=td.map(r=>({id:r.id,text:r.text,cat:r.cat,done:r.done}));
+    if(td) todos=td.map(r=>({id:r.id,text:r.text,cat:r.cat,pri:r.pri??1,status:r.status||(r.done?'done':'todo'),due:r.due||null,memo:r.memo||''}));
     saveLocal();
   }catch(e){console.warn('[SB] exception:',e);}
   showLoading(false);
@@ -674,15 +724,59 @@ async function deleteFromList(id){
 function renderTodos(){
   const el=document.getElementById('todo-list');
   if(!todos.length){el.innerHTML='<div style="text-align:center;color:var(--text3);padding:40px 0;">할 일이 없어요 ✓</div>';return;}
-  el.innerHTML=todos.map(t=>`<div class="todo-item">
-    <div class="todo-check${t.done?' done':''}" onclick="toggleTodo('${t.id}')">
-      ${t.done?'<i class="ti ti-check" style="font-size:11px"></i>':''}
-    </div>
-    <div class="cat-dot" style="background:${CATS[t.cat].dot}"></div>
-    <div class="todo-text${t.done?' done':''}">${escapeHtml(t.text)}</div>
-    <div style="font-size:10px;color:var(--text3);flex-shrink:0;">${CATS[t.cat].name}</div>
-    <button class="todo-del" onclick="delTodo('${t.id}')"><i class="ti ti-x" style="font-size:14px"></i></button>
-  </div>`).join('');
+  const PRI=[
+    {label:'상',cls:'tt-pri-high'},
+    {label:'중',cls:'tt-pri-mid'},
+    {label:'하',cls:'tt-pri-low'}
+  ];
+  const STATUS={
+    todo:{label:'예정',cls:'tt-status-todo'},
+    progress:{label:'진행중',cls:'tt-status-progress'},
+    done:{label:'완료',cls:'tt-status-done'}
+  };
+  const sorted=[...todos].sort((a,b)=>{
+    // 마감일 있는 것 먼저, 빠른 날짜 순
+    if(a.due&&b.due) return a.due.localeCompare(b.due);
+    if(a.due) return -1;
+    if(b.due) return 1;
+    return 0;
+  });
+  const rows=sorted.map(t=>{
+    const cat=CATS[t.cat];
+    const pri=PRI[t.pri ?? 1];
+    const status=STATUS[t.status||'todo'];
+    let dueHtml='<span style="color:var(--text3)">—</span>';
+    let dueCls='';
+    if(t.due){
+      const dueDate=new Date(t.due+'T00:00:00');
+      const todayDate=new Date(todayStr+'T00:00:00');
+      const diffDays=Math.round((dueDate-todayDate)/86400000);
+      if(t.status!=='done'&&diffDays<0) dueCls='overdue';
+      else if(t.status!=='done'&&diffDays<=2) dueCls='soon';
+      dueHtml=`${dueDate.getMonth()+1}/${dueDate.getDate()}`;
+    }
+    return `<tr class="${t.status==='done'?'done-row':''}">
+      <td><div class="tt-check${t.status==='done'?' done':''}" onclick="toggleTodoDone('${t.id}')">
+        ${t.status==='done'?'<i class="ti ti-check" style="font-size:11px"></i>':''}</div></td>
+      <td class="tt-title">${escapeHtml(t.text)}</td>
+      <td><span class="tt-cat-badge" style="background:${cat.bg};border-color:${cat.dot};">
+        <span class="cat-dot" style="background:${cat.dot}"></span>${cat.name}</span></td>
+      <td class="tt-due ${dueCls}">${dueHtml}</td>
+      <td><span class="tt-pri ${pri.cls}">${pri.label}</span></td>
+      <td><span class="tt-status ${status.cls}">${status.label}</span></td>
+      <td class="tt-memo">${t.memo?escapeHtml(t.memo):'<span style="color:var(--text3)">—</span>'}</td>
+      <td class="tt-actions">
+        <button class="tt-action-btn" onclick="editTodo('${t.id}')"><i class="ti ti-pencil"></i></button>
+        <button class="tt-action-btn del" onclick="delTodo('${t.id}')"><i class="ti ti-trash"></i></button>
+      </td>
+    </tr>`;
+  }).join('');
+  el.innerHTML=`<div class="todo-table-wrap">
+    <table class="todo-table">
+      <thead><tr><th></th><th>제목</th><th>구분</th><th>마감일</th><th>우선도</th><th>상태</th><th>메모</th><th>관리</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
 }
 function renderAll(){
   if(currentTab==='cal')renderCal();
@@ -759,19 +853,85 @@ async function addTodo(){
   const inp=document.getElementById('todo-input');
   const text=inp.value.trim();if(!text)return;
   const cat=parseInt(document.getElementById('todo-cat').value);
-  const obj={text,cat,done:false};
-  if(SB){const {data}=await SB.from('cal_todos').insert({...obj,created_at:new Date().toISOString()}).select().single();if(data)todos.unshift({id:data.id,...obj});}
-  else todos.unshift({id:Date.now(),...obj});
-  inp.value='';saveLocal();renderTodos();
-}
-async function toggleTodo(id){
-  const t=todos.find(x=>String(x.id)===String(id));t.done=!t.done;
-  if(SB)await SB.from('cal_todos').update({done:t.done}).eq('id',id);
+  const pri=parseInt(document.getElementById('todo-pri').value);
+  const status=document.getElementById('todo-status').value;
+  const due=document.getElementById('todo-due').value||null;
+  const memo=document.getElementById('todo-memo').value.trim();
+  const obj={text,cat,pri,status,due,memo};
+  if(SB){
+    try{
+      const {data,error}=await SB.from('cal_todos').insert({...obj,created_at:new Date().toISOString()}).select().single();
+      if(error) throw error;
+      if(data) todos.unshift({id:data.id,...obj});
+    }catch(e){
+      console.warn('[SB] addTodo fallback to local:',e);
+      todos.unshift({id:Date.now(),...obj});
+    }
+  } else {
+    todos.unshift({id:Date.now(),...obj});
+  }
+  inp.value='';
+  document.getElementById('todo-due').value='';
+  document.getElementById('todo-memo').value='';
+  document.getElementById('todo-pri').value='1';
+  document.getElementById('todo-status').value='todo';
   saveLocal();renderTodos();
+}
+async function toggleTodoDone(id){
+  const t=todos.find(x=>String(x.id)===String(id));
+  if(!t) return;
+  t.status = t.status==='done' ? 'todo' : 'done';
+  if(SB){
+    try{await SB.from('cal_todos').update({status:t.status}).eq('id',id);}
+    catch(e){console.warn('[SB] toggleTodoDone error:',e);}
+  }
+  saveLocal();renderTodos();
+}
+let editTodoId=null;
+function editTodo(id){
+  const t=todos.find(x=>String(x.id)===String(id));if(!t)return;
+  editTodoId=id;
+  document.getElementById('todo-input').value=t.text;
+  document.getElementById('todo-cat').value=t.cat;
+  document.getElementById('todo-pri').value=t.pri ?? 1;
+  document.getElementById('todo-status').value=t.status||'todo';
+  document.getElementById('todo-due').value=t.due||'';
+  document.getElementById('todo-memo').value=t.memo||'';
+  document.querySelector('.todo-add-box').scrollIntoView({behavior:'smooth',block:'start'});
+  const btn=document.querySelector('.add-todo-btn');
+  btn.innerHTML='<i class="ti ti-check"></i> 수정 완료';
+  btn.onclick=saveEditedTodo;
+}
+async function saveEditedTodo(){
+  const t=todos.find(x=>String(x.id)===String(editTodoId));if(!t)return;
+  t.text=document.getElementById('todo-input').value.trim();
+  t.cat=parseInt(document.getElementById('todo-cat').value);
+  t.pri=parseInt(document.getElementById('todo-pri').value);
+  t.status=document.getElementById('todo-status').value;
+  t.due=document.getElementById('todo-due').value||null;
+  t.memo=document.getElementById('todo-memo').value.trim();
+  if(SB){
+    try{await SB.from('cal_todos').update({text:t.text,cat:t.cat,pri:t.pri,status:t.status,due:t.due,memo:t.memo}).eq('id',editTodoId);}
+    catch(e){console.warn('[SB] saveEditedTodo error:',e);}
+  }
+  saveLocal();
+  document.getElementById('todo-input').value='';
+  document.getElementById('todo-due').value='';
+  document.getElementById('todo-memo').value='';
+  document.getElementById('todo-pri').value='1';
+  document.getElementById('todo-status').value='todo';
+  const btn=document.querySelector('.add-todo-btn');
+  btn.innerHTML='<i class="ti ti-plus"></i> 할 일 추가';
+  btn.onclick=addTodo;
+  editTodoId=null;
+  renderTodos();
 }
 async function delTodo(id){
   todos=todos.filter(x=>String(x.id)!==String(id));
-  if(SB)await SB.from('cal_todos').delete().eq('id',id);
+  if(SB){
+    try{await SB.from('cal_todos').delete().eq('id',id);}
+    catch(e){console.warn('[SB] delTodo error:',e);}
+  }
   saveLocal();renderTodos();
 }
 
