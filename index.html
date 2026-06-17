@@ -131,36 +131,34 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
   border-left:2px solid transparent;color:#111 !important;}
 .more-chip{font-size:10px;color:var(--text2);padding:0 4px;font-weight:600;}
 
-/* ── 리스트 뷰 (월별 아코디언) ── */
+/* ── 리스트 뷰 (전체 일정, 날짜순 단일 테이블) ── */
 .list-wrap{padding:10px 16px 80px;}
-.month-accordion{border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;}
-.month-acc-header{display:flex;align-items:center;justify-content:space-between;
-  padding:13px 16px;background:var(--surface);cursor:pointer;}
-.month-acc-header:hover{background:#ececea;}
-.month-acc-title{font-size:15px;font-weight:700;color:var(--text1);display:flex;align-items:center;gap:8px;}
-.month-acc-count{font-size:11px;color:var(--text2);background:var(--app-bg);
-  border:1px solid var(--border);border-radius:10px;padding:2px 8px;font-weight:500;}
-.month-acc-chevron{font-size:16px;color:var(--text2);transition:transform .2s;}
-.month-acc-chevron.open{transform:rotate(90deg);}
-.month-acc-body{display:none;}
-.month-acc-body.open{display:block;}
-
-.list-table{width:100%;border-collapse:collapse;}
-.list-table th{text-align:left;font-size:11px;color:var(--text2);font-weight:700;
-  padding:8px 12px;border-bottom:1px solid var(--border);background:var(--app-bg);
-  text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;}
-.list-table td{padding:10px 12px;border-bottom:1px solid #eee;font-size:var(--fs-sm);
+.list-table-wrap{border:1.5px solid var(--border);border-radius:10px;overflow:auto;}
+.list-table{width:100%;border-collapse:collapse;min-width:560px;}
+.list-table th{text-align:left;font-size:11px;color:#fff;font-weight:700;
+  padding:10px 12px;background:#2c3e50;
+  text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;
+  border-right:1px solid rgba(255,255,255,.12);}
+.list-table th:last-child{border-right:none;}
+.list-table td{padding:11px 12px;border-bottom:1px solid var(--border);
+  border-right:1px solid var(--border);font-size:var(--fs-sm);
   color:var(--text1);vertical-align:top;}
+.list-table td:last-child{border-right:none;}
 .list-table tr:last-child td{border-bottom:none;}
-.list-table tr{cursor:pointer;}
 .list-table tr:hover td{background:#f7faff;}
-.lt-date{white-space:nowrap;font-weight:600;color:var(--text1);}
+.lt-date{white-space:nowrap;font-weight:700;color:var(--text1);}
 .lt-date .lt-lunar{font-size:10px;color:var(--text3);font-weight:400;display:block;}
 .lt-cat{white-space:nowrap;}
-.lt-cat-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;
-  padding:2px 8px;border-radius:10px;font-weight:600;}
-.lt-title{font-weight:600;color:#111;max-width:220px;}
-.lt-memo{color:var(--text2);max-width:260px;}
+.lt-cat-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;
+  padding:3px 10px;border-radius:12px;font-weight:700;border:1.5px solid transparent;}
+.lt-title{font-weight:700;color:#111;max-width:200px;}
+.lt-memo{color:var(--text2);max-width:240px;}
+.lt-actions{white-space:nowrap;}
+.lt-action-btn{background:none;border:1px solid var(--border);border-radius:6px;
+  width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--text2);font-size:13px;margin-right:4px;}
+.lt-action-btn:hover{background:var(--surface);}
+.lt-action-btn.del:hover{color:#E24B4A;border-color:#fbbaba;}
 .list-empty{text-align:center;color:var(--text3);font-size:var(--fs-base);padding:48px 0;}
 
 /* ── 일자별 일정 팝업 ── */
@@ -491,8 +489,8 @@ async function loadFromSb(){
 
 /* ═══ 데이터 ═══ */
 const CATS=[
-  {name:'개인',bg:'#E6F1FB',color:'#111',dot:'#378ADD',bar:'#378ADD'},
-  {name:'업무',bg:'#EAF3DE',color:'#111',dot:'#639922',bar:'#639922'},
+  {name:'개인',bg:'#EDEDED',color:'#111',dot:'#8A8A8A',bar:'#8A8A8A'},
+  {name:'업무',bg:'#FFE3CC',color:'#111',dot:'#E2772E',bar:'#E2772E'},
   {name:'건강',bg:'#FAEEDA',color:'#111',dot:'#EF9F27',bar:'#EF9F27'},
   {name:'기타',bg:'#EEEDFE',color:'#111',dot:'#7F77DD',bar:'#7F77DD'}
 ];
@@ -631,7 +629,7 @@ async function deleteFromPopup(id){
   saveLocal();renderDayPopupList();renderAll();
 }
 
-/* ═══ 리스트 뷰 (전체 일정, 월별 아코디언) ═══ */
+/* ═══ 리스트 뷰 (전체 일정, 날짜순 단일 테이블) ═══ */
 function renderList(){
   document.getElementById('month-label').textContent=`전체 일정`;
   if(!events.length){
@@ -639,57 +637,37 @@ function renderList(){
     return;
   }
   const sorted=[...events].sort((a,b)=>a.date.localeCompare(b.date));
-  const groups={}; // "YYYY-MM" -> [events]
-  sorted.forEach(e=>{
-    const key=e.date.slice(0,7);
-    if(!groups[key]) groups[key]=[];
-    groups[key].push(e);
-  });
-  const curKey=`${cur.getFullYear()}-${p2(cur.getMonth()+1)}`;
-  // 기본적으로 현재 월만 펼침 (처음 진입 시)
-  if(openMonthKeys.size===0) openMonthKeys.add(curKey);
-
-  const monthKeys=Object.keys(groups).sort();
-  let html='';
-  monthKeys.forEach(key=>{
-    const [yy,mm]=key.split('-').map(Number);
-    const isOpen=openMonthKeys.has(key);
-    const rows=groups[key].map(e=>{
-      const d=new Date(e.date+'T00:00:00');
-      const lbl=lunarLabel(d.getFullYear(),d.getMonth()+1,d.getDate());
-      return `<tr onclick="openDayPopup('${e.date}')">
-        <td class="lt-date">${d.getMonth()+1}/${d.getDate()} (${DAYS[d.getDay()]})<span class="lt-lunar">음력 ${lbl}</span></td>
-        <td class="lt-cat"><span class="lt-cat-badge" style="background:${CATS[e.cat].bg};color:#111;">
-          <span class="cat-dot" style="background:${CATS[e.cat].dot}"></span>${CATS[e.cat].name}</span></td>
-        <td class="lt-title">${escapeHtml(e.title)}</td>
-        <td class="lt-memo">${e.memo?escapeHtml(e.memo):'<span style=\"color:var(--text3)\">—</span>'}</td>
-      </tr>`;
-    }).join('');
-    html+=`<div class="month-accordion">
-      <div class="month-acc-header" onclick="toggleMonthAcc('${key}')">
-        <div class="month-acc-title">
-          <i class="ti ti-chevron-right month-acc-chevron${isOpen?' open':''}" id="chev-${key}"></i>
-          ${yy}년 ${KR[mm-1]}
-        </div>
-        <div class="month-acc-count">${groups[key].length}건</div>
-      </div>
-      <div class="month-acc-body${isOpen?' open':''}" id="body-${key}">
-        <table class="list-table">
-          <thead><tr><th>날짜</th><th>구분</th><th>일정 제목</th><th>메모</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>
+  const rows=sorted.map(e=>{
+    const d=new Date(e.date+'T00:00:00');
+    const lbl=lunarLabel(d.getFullYear(),d.getMonth()+1,d.getDate());
+    const cat=CATS[e.cat];
+    return `<tr>
+      <td class="lt-date">${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()} (${DAYS[d.getDay()]})<span class="lt-lunar">음력 ${lbl}</span></td>
+      <td class="lt-cat"><span class="lt-cat-badge" style="background:${cat.bg};color:#111;border-color:${cat.dot};">
+        <span class="cat-dot" style="background:${cat.dot}"></span>${cat.name}</span></td>
+      <td class="lt-title">${escapeHtml(e.title)}</td>
+      <td class="lt-memo">${e.memo?escapeHtml(e.memo):'<span style="color:var(--text3)">—</span>'}</td>
+      <td class="lt-actions">
+        <button class="lt-action-btn" onclick="event.stopPropagation();editFromList('${e.id}')"><i class="ti ti-pencil"></i></button>
+        <button class="lt-action-btn del" onclick="event.stopPropagation();deleteFromList('${e.id}')"><i class="ti ti-trash"></i></button>
+      </td>
+    </tr>`;
+  }).join('');
+  document.getElementById('list-content').innerHTML=`
+    <div class="list-table-wrap">
+      <table class="list-table">
+        <thead><tr><th>날짜</th><th>구분</th><th>일정 제목</th><th>메모</th><th>관리</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
     </div>`;
-  });
-  document.getElementById('list-content').innerHTML=html;
 }
-function toggleMonthAcc(key){
-  const body=document.getElementById('body-'+key);
-  const chev=document.getElementById('chev-'+key);
-  const willOpen=!body.classList.contains('open');
-  if(willOpen){openMonthKeys.add(key);} else {openMonthKeys.delete(key);}
-  body.classList.toggle('open',willOpen);
-  chev.classList.toggle('open',willOpen);
+function editFromList(id){
+  openEditById(id);
+}
+async function deleteFromList(id){
+  events=events.filter(e=>String(e.id)!==String(id));
+  if(SB) await SB.from('cal_events').delete().eq('id',id);
+  saveLocal();renderList();
 }
 
 /* ═══ 할 일 ═══ */
