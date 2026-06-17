@@ -110,7 +110,13 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
 .day-hdr.sun{color:#ff8a8a;}
 .day-hdr.sat{color:#90caff;}
 .days{display:grid;grid-template-columns:repeat(7,1fr);
-  border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;overflow:hidden;}
+  border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;overflow:hidden;
+  touch-action:pan-y;}
+.cell-resize-handle{display:flex;align-items:center;justify-content:center;
+  padding:8px 0;cursor:ns-resize;touch-action:none;}
+.cell-resize-bar{width:50px;height:5px;border-radius:3px;background:var(--border);}
+.cell-resize-handle:hover .cell-resize-bar,.cell-resize-handle.dragging .cell-resize-bar{background:var(--accent);}
+.days.swiping{transition:transform .15s ease-out;}
 .day-cell{min-height:var(--cell-h);padding:3px 3px 3px 3px;
   border-right:1px solid var(--border);border-bottom:1px solid var(--border);
   cursor:pointer;background:var(--app-bg);display:flex;flex-direction:column;overflow:hidden;}
@@ -310,7 +316,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
       <button class="tab" id="tab-todo" onclick="switchTab('todo')">할 일</button>
     </div>
     <div class="right-btns">
-      <button class="add-btn" onclick="openModal()"><i class="ti ti-plus"></i> 추가</button>
+      <button class="add-btn" onclick="onAddBtnClick()"><i class="ti ti-plus"></i> 추가</button>
       <button class="settings-btn" id="settings-btn" onclick="toggleSettings()"><i class="ti ti-settings"></i></button>
     </div>
   </div>
@@ -371,6 +377,9 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
         <div class="day-hdr">금</div><div class="day-hdr sat">토</div>
       </div>
       <div class="days" id="days"></div>
+      <div class="cell-resize-handle" id="cell-resize-handle">
+        <div class="cell-resize-bar"></div>
+      </div>
     </div>
   </div>
 
@@ -380,27 +389,6 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
 
   <div id="todo-view" style="display:none;">
     <div class="todo-panel">
-      <div class="section-title">할 일 추가</div>
-      <div class="todo-add-box">
-        <div class="todo-add-row">
-          <input type="text" id="todo-input" placeholder="할 일 제목...">
-          <select class="cat-sel" id="todo-cat">
-            <option value="0">개인</option><option value="1">업무</option>
-            <option value="2">건강</option><option value="3">기타</option>
-          </select>
-        </div>
-        <div class="todo-add-row">
-          <select class="pri-sel" id="todo-pri">
-            <option value="2">우선도: 하</option>
-            <option value="1" selected>우선도: 중</option>
-            <option value="0">우선도: 상</option>
-          </select>
-          <input type="date" id="todo-due" title="마감일">
-        </div>
-        <textarea id="todo-memo" placeholder="메모 (선택, 자세한 내용 작성 가능)"></textarea>
-        <button class="add-todo-btn" onclick="addTodo()" style="width:100%;"><i class="ti ti-plus"></i> 할 일 추가</button>
-      </div>
-      <div class="section-title">할 일 목록</div>
       <div id="todo-list"></div>
     </div>
   </div>
@@ -434,6 +422,30 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
       <button class="btn-cancel" onclick="closeModal()">취소</button>
       <button id="del-btn" class="btn-del" style="display:none" onclick="deleteEvent()">삭제</button>
       <button class="btn-save" onclick="saveEvent()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 할 일 추가/수정 모달 -->
+<div class="modal-overlay" id="todo-modal-overlay" onclick="if(event.target===this)closeTodoModal()">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3 id="todo-modal-title">할 일 추가</h3>
+    <input type="text" id="todo-input" placeholder="할 일 제목">
+    <select id="todo-cat">
+      <option value="0">개인</option><option value="1">업무</option>
+      <option value="2">건강</option><option value="3">기타</option>
+    </select>
+    <select id="todo-pri">
+      <option value="2">우선도: 하</option>
+      <option value="1" selected>우선도: 중</option>
+      <option value="0">우선도: 상</option>
+    </select>
+    <input type="date" id="todo-due" title="마감일">
+    <textarea id="todo-memo" placeholder="할일 (선택, 자세한 내용 작성 가능)"></textarea>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeTodoModal()">취소</button>
+      <button class="btn-save" id="todo-save-btn" onclick="addTodo()">추가</button>
     </div>
   </div>
 </div>
@@ -733,7 +745,7 @@ function renderTodos(){
   const el=document.getElementById('todo-list');
   // 완료되지 않은 항목만 화면에 표시
   const active=todos.filter(t=>t.status!=='done');
-  if(!active.length){el.innerHTML='<div style="text-align:center;color:var(--text3);padding:40px 0;">할 일이 없어요 ✓</div>';return;}
+  if(!active.length){el.innerHTML='<div style="text-align:center;color:var(--text3);padding:40px 0;">할 일이 없어요 ✓<br><span style="font-size:12px;">우측 상단 "추가" 버튼으로 새 할 일을 등록해보세요</span></div>';return;}
   const PRI=[
     {label:'상',cls:'tt-pri-high'},
     {label:'중',cls:'tt-pri-mid'},
@@ -812,6 +824,96 @@ function switchTab(tab){
 function changeMonth(d){cur.setMonth(cur.getMonth()+d);renderAll();}
 function goToday(){cur=new Date();renderAll();}
 
+/* ═══ 모바일 좌우 스와이프로 월 이동 ═══ */
+(function initSwipe(){
+  const daysEl=document.getElementById('days');
+  let startX=0,startY=0,deltaX=0,isSwiping=false;
+  daysEl.addEventListener('touchstart',e=>{
+    if(e.touches.length!==1) return;
+    startX=e.touches[0].clientX;startY=e.touches[0].clientY;
+    deltaX=0;isSwiping=false;
+  },{passive:true});
+  daysEl.addEventListener('touchmove',e=>{
+    if(e.touches.length!==1) return;
+    const dx=e.touches[0].clientX-startX;
+    const dy=e.touches[0].clientY-startY;
+    if(!isSwiping){
+      if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>8) isSwiping=true;
+      else if(Math.abs(dy)>Math.abs(dx)) return; // 세로 스크롤은 무시
+    }
+    if(isSwiping){
+      deltaX=dx;
+      daysEl.style.transform=`translateX(${dx*0.4}px)`;
+      daysEl.style.opacity=Math.max(0.5,1-Math.abs(dx)/300);
+    }
+  },{passive:true});
+  daysEl.addEventListener('touchend',()=>{
+    if(isSwiping&&Math.abs(deltaX)>60){
+      daysEl.style.transition='transform .18s ease-out, opacity .18s ease-out';
+      daysEl.style.transform=`translateX(${deltaX>0?60:-60}px)`;
+      daysEl.style.opacity='0';
+      setTimeout(()=>{
+        changeMonth(deltaX>0?-1:1);
+        daysEl.style.transition='none';
+        daysEl.style.transform='translateX(0)';
+        daysEl.style.opacity='1';
+      },160);
+    } else {
+      daysEl.style.transition='transform .15s ease-out, opacity .15s ease-out';
+      daysEl.style.transform='translateX(0)';
+      daysEl.style.opacity='1';
+    }
+    isSwiping=false;deltaX=0;
+  });
+})();
+
+/* ═══ 드래그로 캘린더 셀 높이 조절 ═══ */
+(function initCellResize(){
+  const handle=document.getElementById('cell-resize-handle');
+  let startY=0,startH=0,dragging=false;
+  const MIN_H=50,MAX_H=160;
+
+  function getCurH(){
+    const v=getComputedStyle(document.documentElement).getPropertyValue('--cell-h').trim();
+    return parseInt(v)||68;
+  }
+  function setCurH(h){
+    h=Math.max(MIN_H,Math.min(MAX_H,h));
+    document.documentElement.style.setProperty('--cell-h',h+'px');
+    localStorage.setItem('cal_cell_h',h);
+  }
+  // 저장된 높이 복원
+  const savedH=localStorage.getItem('cal_cell_h');
+  if(savedH) document.documentElement.style.setProperty('--cell-h',savedH+'px');
+
+  function onStart(clientY){
+    startY=clientY;startH=getCurH();dragging=true;
+    handle.classList.add('dragging');
+  }
+  function onMove(clientY){
+    if(!dragging) return;
+    const dy=clientY-startY;
+    setCurH(startH+dy);
+  }
+  function onEnd(){
+    dragging=false;
+    handle.classList.remove('dragging');
+  }
+  handle.addEventListener('touchstart',e=>{onStart(e.touches[0].clientY);},{passive:true});
+  handle.addEventListener('touchmove',e=>{onMove(e.touches[0].clientY);},{passive:true});
+  handle.addEventListener('touchend',onEnd);
+  handle.addEventListener('mousedown',e=>{onStart(e.clientY);e.preventDefault();});
+  window.addEventListener('mousemove',e=>{if(dragging)onMove(e.clientY);});
+  window.addEventListener('mouseup',onEnd);
+})();
+
+
+/* ═══ 상단 추가 버튼: 탭에 따라 다른 동작 ═══ */
+function onAddBtnClick(){
+  if(currentTab==='todo') openTodoModal();
+  else openModal();
+}
+
 /* ═══ 일정 추가/수정 모달 ═══ */
 function openModal(date){
   editId=null;
@@ -865,6 +967,25 @@ async function deleteEvent(){
   if(dpDate) renderDayPopupList();
   renderAll();
 }
+
+/* ═══ 할 일 추가/수정 모달 ═══ */
+let editTodoId=null;
+function openTodoModal(){
+  editTodoId=null;
+  document.getElementById('todo-modal-title').textContent='할 일 추가';
+  document.getElementById('todo-input').value='';
+  document.getElementById('todo-cat').value='0';
+  document.getElementById('todo-pri').value='1';
+  document.getElementById('todo-due').value='';
+  document.getElementById('todo-memo').value='';
+  document.getElementById('todo-save-btn').textContent='추가';
+  document.getElementById('todo-save-btn').onclick=addTodo;
+  document.getElementById('todo-modal-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('todo-input').focus(),100);
+}
+function closeTodoModal(){
+  document.getElementById('todo-modal-overlay').classList.remove('open');
+}
 async function addTodo(){
   const inp=document.getElementById('todo-input');
   const text=inp.value.trim();if(!text)return;
@@ -886,25 +1007,21 @@ async function addTodo(){
   } else {
     todos.unshift({id:Date.now(),...obj});
   }
-  inp.value='';
-  document.getElementById('todo-due').value='';
-  document.getElementById('todo-memo').value='';
-  document.getElementById('todo-pri').value='1';
+  closeTodoModal();
   saveLocal();renderTodos();
 }
-let editTodoId=null;
 function editTodo(id){
   const t=todos.find(x=>String(x.id)===String(id));if(!t)return;
   editTodoId=id;
+  document.getElementById('todo-modal-title').textContent='할 일 수정';
   document.getElementById('todo-input').value=t.text;
   document.getElementById('todo-cat').value=t.cat;
   document.getElementById('todo-pri').value=t.pri ?? 1;
   document.getElementById('todo-due').value=t.due||'';
   document.getElementById('todo-memo').value=t.memo||'';
-  document.querySelector('.todo-add-box').scrollIntoView({behavior:'smooth',block:'start'});
-  const btn=document.querySelector('.add-todo-btn');
-  btn.innerHTML='<i class="ti ti-check"></i> 수정 완료';
-  btn.onclick=saveEditedTodo;
+  document.getElementById('todo-save-btn').textContent='수정 완료';
+  document.getElementById('todo-save-btn').onclick=saveEditedTodo;
+  document.getElementById('todo-modal-overlay').classList.add('open');
 }
 async function saveEditedTodo(){
   const t=todos.find(x=>String(x.id)===String(editTodoId));if(!t)return;
@@ -918,13 +1035,7 @@ async function saveEditedTodo(){
     catch(e){console.warn('[SB] saveEditedTodo error:',e);}
   }
   saveLocal();
-  document.getElementById('todo-input').value='';
-  document.getElementById('todo-due').value='';
-  document.getElementById('todo-memo').value='';
-  document.getElementById('todo-pri').value='1';
-  const btn=document.querySelector('.add-todo-btn');
-  btn.innerHTML='<i class="ti ti-plus"></i> 할 일 추가';
-  btn.onclick=addTodo;
+  closeTodoModal();
   editTodoId=null;
   renderTodos();
 }
