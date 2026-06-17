@@ -456,12 +456,18 @@ async function saveSbConfig(){
 async function loadFromSb(){
   if(!SB)return;showLoading(true);
   try{
-    const {data:ev}=await SB.from('cal_events').select('*').order('date');
-    const {data:td}=await SB.from('cal_todos').select('*').order('created_at',{ascending:false});
+    const {data:ev,error:evErr}=await SB.from('cal_events').select('*').order('date');
+    const {data:td,error:tdErr}=await SB.from('cal_todos').select('*').order('created_at',{ascending:false});
+    console.log('[SB] events:',ev,'error:',evErr);
+    console.log('[SB] todos:',td,'error:',tdErr);
+    if(evErr||tdErr){
+      const st=document.getElementById('sb-status');
+      if(st) st.textContent='⚠️ 불러오기 실패: '+((evErr||tdErr).message);
+    }
     if(ev) events=ev.map(r=>({id:r.id,title:r.title,date:r.date,cat:r.cat,memo:r.memo||''}));
     if(td) todos=td.map(r=>({id:r.id,text:r.text,cat:r.cat,done:r.done}));
     saveLocal();
-  }catch(e){console.warn(e);}
+  }catch(e){console.warn('[SB] loadFromSb exception:',e);}
   showLoading(false);
 }
 
