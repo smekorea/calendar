@@ -21,8 +21,8 @@
   --app-bg:#ffffff;--surface:#f4f4f2;--border:#d8d8d5;
   --text1:#111111;--text2:#555555;--text3:#b0b0b0;
   --accent:#378ADD;--accent2:#185FA5;
-  --fs-base:14px;--fs-sm:13px;--fs-xs:11px;--fs-lg:22px;
-  --cell-h:96px;
+  --fs-base:13px;--fs-sm:12px;--fs-xs:10px;--fs-lg:18px;
+  --cell-h:68px;
 }
 html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans-serif;background:#ddd;}
 .app{display:flex;flex-direction:column;min-height:100dvh;background:var(--app-bg);}
@@ -38,8 +38,11 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
   background:var(--app-bg);position:sticky;top:0;z-index:20;gap:8px;flex-wrap:wrap;}
 .nav-month{display:flex;align-items:center;gap:4px;flex-shrink:0;}
 .nav-title{display:flex;flex-direction:column;}
-.nav-sub{font-size:13px;color:#111;font-weight:700;letter-spacing:.5px;line-height:1;margin-bottom:3px;}
+.nav-sub{font-size:11px;color:#111;font-weight:700;letter-spacing:.3px;line-height:1;margin-bottom:3px;}
 .nav-month h2{font-size:var(--fs-lg);font-weight:800;color:var(--text1);white-space:nowrap;}
+@media(min-width:768px){
+  .nav-sub{font-size:13px;letter-spacing:.5px;}
+}
 .icon-btn{background:none;border:none;cursor:pointer;color:var(--text2);font-size:18px;
   display:flex;align-items:center;justify-content:center;border-radius:8px;width:36px;height:36px;flex-shrink:0;}
 .icon-btn:hover{background:var(--surface);}
@@ -100,36 +103,46 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
 .cat-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
 
 /* ── 월간 캘린더 ── */
-.calendar-wrap{padding:0 12px 20px;}
+.calendar-wrap{padding:0 6px 16px;}
 .day-headers{display:grid;grid-template-columns:repeat(7,1fr);
   background:#2c3e50;border-radius:6px 6px 0 0;border:1px solid #2c3e50;}
-.day-hdr{text-align:center;padding:8px 0;font-weight:700;font-size:14px;color:#ffffff;}
+.day-hdr{text-align:center;padding:7px 0;font-weight:700;font-size:12px;color:#ffffff;}
 .day-hdr.sun{color:#ff8a8a;}
 .day-hdr.sat{color:#90caff;}
 .days{display:grid;grid-template-columns:repeat(7,1fr);
   border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;overflow:hidden;}
-.day-cell{min-height:var(--cell-h);padding:4px 6px 4px 4px;
+.day-cell{min-height:var(--cell-h);padding:3px 3px 3px 3px;
   border-right:1px solid var(--border);border-bottom:1px solid var(--border);
-  cursor:pointer;background:var(--app-bg);display:flex;flex-direction:column;}
+  cursor:pointer;background:var(--app-bg);display:flex;flex-direction:column;overflow:hidden;}
 .day-cell:nth-child(7n){border-right:none;}
 .day-cell:hover{background:#f5f8ff;}
 .day-cell.other-month{background:#f9f9f7;}
-.day-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px;}
-.day-num{font-size:14px;font-weight:700;width:26px;height:26px;
+.day-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px;}
+.day-num{font-size:12px;font-weight:700;width:20px;height:20px;
   display:flex;align-items:center;justify-content:center;border-radius:50%;
-  color:var(--text1);align-self:flex-end;}
+  color:var(--text1);align-self:flex-end;flex-shrink:0;}
 .day-num.sun-num{color:#E24B4A;}
 .day-num.sat-num{color:#378ADD;}
 .day-num.today-num{background:var(--accent);color:#fff !important;}
 .day-cell.other-month .day-num{color:var(--text3);}
-.other-label{font-size:10px;font-weight:600;color:var(--text3);align-self:flex-end;margin-bottom:2px;line-height:1;}
-.lunar{font-size:10px;color:var(--text3);line-height:1;margin-top:1px;}
+.other-label{font-size:9px;font-weight:600;color:var(--text3);align-self:flex-end;margin-bottom:2px;line-height:1;}
+.lunar{font-size:9px;color:var(--text3);line-height:1;margin-top:1px;}
 .lunar.lunar-holiday{color:#E24B4A;font-weight:700;}
 .day-cell.other-month .lunar{color:#ccc;}
-.event-chip{font-size:10px;padding:2px 5px;border-radius:4px;margin-bottom:2px;
+.event-chip{font-size:9px;padding:1px 3px;border-radius:3px;margin-bottom:1px;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;line-height:1.4;
   border-left:2px solid transparent;color:#111 !important;}
-.more-chip{font-size:10px;color:var(--text2);padding:0 4px;font-weight:600;}
+.more-chip{font-size:9px;color:var(--text2);padding:0 3px;font-weight:600;}
+@media(min-width:768px){
+  .calendar-wrap{padding:0 12px 20px;}
+  .day-hdr{padding:8px 0;font-size:14px;}
+  .day-cell{padding:4px 6px 4px 4px;}
+  .day-num{font-size:14px;width:26px;height:26px;}
+  .other-label{font-size:10px;}
+  .lunar{font-size:10px;}
+  .event-chip{font-size:10px;padding:2px 5px;}
+  .more-chip{font-size:10px;padding:0 4px;}
+}
 
 /* ── 리스트 뷰 (전체 일정, 날짜순 단일 테이블) ── */
 .list-wrap{padding:10px 16px 80px;}
@@ -377,17 +390,12 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
           </select>
         </div>
         <div class="todo-add-row">
-          <input type="date" id="todo-due" title="마감일">
           <select class="pri-sel" id="todo-pri">
             <option value="2">우선도: 하</option>
             <option value="1" selected>우선도: 중</option>
             <option value="0">우선도: 상</option>
           </select>
-          <select class="status-sel" id="todo-status">
-            <option value="todo" selected>예정</option>
-            <option value="progress">진행중</option>
-            <option value="done">완료</option>
-          </select>
+          <input type="date" id="todo-due" title="마감일">
         </div>
         <textarea id="todo-memo" placeholder="메모 (선택, 자세한 내용 작성 가능)"></textarea>
         <button class="add-todo-btn" onclick="addTodo()" style="width:100%;"><i class="ti ti-plus"></i> 할 일 추가</button>
@@ -531,7 +539,7 @@ async function loadFromSb(){
     const {data:td,error:tdErr}=await SB.from('cal_todos').select('*').order('created_at',{ascending:false});
     if(evErr||tdErr) console.warn('[SB] load error:',evErr,tdErr);
     if(ev) events=ev.map(r=>({id:r.id,title:r.title,date:r.date,cat:r.cat,memo:r.memo||''}));
-    if(td) todos=td.map(r=>({id:r.id,text:r.text,cat:r.cat,pri:r.pri??1,status:r.status||(r.done?'done':'todo'),due:r.due||null,memo:r.memo||''}));
+    if(td) todos=td.map(r=>({id:r.id,text:r.text,cat:r.cat,pri:r.pri??1,status:r.status||(r.done?'done':'todo'),due:r.due||null,memo:r.memo||'',created_at:r.created_at||null}));
     saveLocal();
   }catch(e){console.warn('[SB] exception:',e);}
   showLoading(false);
@@ -723,19 +731,15 @@ async function deleteFromList(id){
 /* ═══ 할 일 ═══ */
 function renderTodos(){
   const el=document.getElementById('todo-list');
-  if(!todos.length){el.innerHTML='<div style="text-align:center;color:var(--text3);padding:40px 0;">할 일이 없어요 ✓</div>';return;}
+  // 완료되지 않은 항목만 화면에 표시
+  const active=todos.filter(t=>t.status!=='done');
+  if(!active.length){el.innerHTML='<div style="text-align:center;color:var(--text3);padding:40px 0;">할 일이 없어요 ✓</div>';return;}
   const PRI=[
     {label:'상',cls:'tt-pri-high'},
     {label:'중',cls:'tt-pri-mid'},
     {label:'하',cls:'tt-pri-low'}
   ];
-  const STATUS={
-    todo:{label:'예정',cls:'tt-status-todo'},
-    progress:{label:'진행중',cls:'tt-status-progress'},
-    done:{label:'완료',cls:'tt-status-done'}
-  };
-  const sorted=[...todos].sort((a,b)=>{
-    // 마감일 있는 것 먼저, 빠른 날짜 순
+  const sorted=[...active].sort((a,b)=>{
     if(a.due&&b.due) return a.due.localeCompare(b.due);
     if(a.due) return -1;
     if(b.due) return 1;
@@ -744,27 +748,27 @@ function renderTodos(){
   const rows=sorted.map(t=>{
     const cat=CATS[t.cat];
     const pri=PRI[t.pri ?? 1];
-    const status=STATUS[t.status||'todo'];
+    const createdDate=t.created_at?new Date(t.created_at):null;
+    const createdLabel=createdDate?`${createdDate.getMonth()+1}/${createdDate.getDate()}`:'—';
     let dueHtml='<span style="color:var(--text3)">—</span>';
     let dueCls='';
     if(t.due){
       const dueDate=new Date(t.due+'T00:00:00');
       const todayDate=new Date(todayStr+'T00:00:00');
       const diffDays=Math.round((dueDate-todayDate)/86400000);
-      if(t.status!=='done'&&diffDays<0) dueCls='overdue';
-      else if(t.status!=='done'&&diffDays<=2) dueCls='soon';
+      if(diffDays<0) dueCls='overdue';
+      else if(diffDays<=2) dueCls='soon';
       dueHtml=`${dueDate.getMonth()+1}/${dueDate.getDate()}`;
     }
-    return `<tr class="${t.status==='done'?'done-row':''}">
-      <td><div class="tt-check${t.status==='done'?' done':''}" onclick="toggleTodoDone('${t.id}')">
-        ${t.status==='done'?'<i class="ti ti-check" style="font-size:11px"></i>':''}</div></td>
-      <td class="tt-title">${escapeHtml(t.text)}</td>
+    return `<tr>
+      <td><div class="tt-check" onclick="confirmCompleteTodo('${t.id}')"></div></td>
+      <td class="tt-due">${createdLabel}</td>
       <td><span class="tt-cat-badge" style="background:${cat.bg};border-color:${cat.dot};">
         <span class="cat-dot" style="background:${cat.dot}"></span>${cat.name}</span></td>
-      <td class="tt-due ${dueCls}">${dueHtml}</td>
-      <td><span class="tt-pri ${pri.cls}">${pri.label}</span></td>
-      <td><span class="tt-status ${status.cls}">${status.label}</span></td>
+      <td class="tt-title">${escapeHtml(t.text)}</td>
       <td class="tt-memo">${t.memo?escapeHtml(t.memo):'<span style="color:var(--text3)">—</span>'}</td>
+      <td><span class="tt-pri ${pri.cls}">${pri.label}</span></td>
+      <td class="tt-due ${dueCls}">${dueHtml}</td>
       <td class="tt-actions">
         <button class="tt-action-btn" onclick="editTodo('${t.id}')"><i class="ti ti-pencil"></i></button>
         <button class="tt-action-btn del" onclick="delTodo('${t.id}')"><i class="ti ti-trash"></i></button>
@@ -773,10 +777,22 @@ function renderTodos(){
   }).join('');
   el.innerHTML=`<div class="todo-table-wrap">
     <table class="todo-table">
-      <thead><tr><th></th><th>제목</th><th>구분</th><th>마감일</th><th>우선도</th><th>상태</th><th>메모</th><th>관리</th></tr></thead>
+      <thead><tr><th></th><th>등록일자</th><th>구분</th><th>제목</th><th>할일</th><th>우선도</th><th>마감일자</th><th>관리</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
   </div>`;
+}
+async function confirmCompleteTodo(id){
+  const t=todos.find(x=>String(x.id)===String(id));if(!t)return;
+  const ok=window.confirm('정말 완료하시겠습니까?');
+  if(!ok) return;
+  t.status='done';
+  t.completed_at=new Date().toISOString();
+  if(SB){
+    try{await SB.from('cal_todos').update({status:'done',completed_at:t.completed_at}).eq('id',id);}
+    catch(e){console.warn('[SB] confirmCompleteTodo error:',e);}
+  }
+  saveLocal();renderTodos();
 }
 function renderAll(){
   if(currentTab==='cal')renderCal();
@@ -854,13 +870,13 @@ async function addTodo(){
   const text=inp.value.trim();if(!text)return;
   const cat=parseInt(document.getElementById('todo-cat').value);
   const pri=parseInt(document.getElementById('todo-pri').value);
-  const status=document.getElementById('todo-status').value;
   const due=document.getElementById('todo-due').value||null;
   const memo=document.getElementById('todo-memo').value.trim();
-  const obj={text,cat,pri,status,due,memo};
+  const createdAt=new Date().toISOString();
+  const obj={text,cat,pri,status:'todo',due,memo,created_at:createdAt};
   if(SB){
     try{
-      const {data,error}=await SB.from('cal_todos').insert({...obj,created_at:new Date().toISOString()}).select().single();
+      const {data,error}=await SB.from('cal_todos').insert(obj).select().single();
       if(error) throw error;
       if(data) todos.unshift({id:data.id,...obj});
     }catch(e){
@@ -874,17 +890,6 @@ async function addTodo(){
   document.getElementById('todo-due').value='';
   document.getElementById('todo-memo').value='';
   document.getElementById('todo-pri').value='1';
-  document.getElementById('todo-status').value='todo';
-  saveLocal();renderTodos();
-}
-async function toggleTodoDone(id){
-  const t=todos.find(x=>String(x.id)===String(id));
-  if(!t) return;
-  t.status = t.status==='done' ? 'todo' : 'done';
-  if(SB){
-    try{await SB.from('cal_todos').update({status:t.status}).eq('id',id);}
-    catch(e){console.warn('[SB] toggleTodoDone error:',e);}
-  }
   saveLocal();renderTodos();
 }
 let editTodoId=null;
@@ -894,7 +899,6 @@ function editTodo(id){
   document.getElementById('todo-input').value=t.text;
   document.getElementById('todo-cat').value=t.cat;
   document.getElementById('todo-pri').value=t.pri ?? 1;
-  document.getElementById('todo-status').value=t.status||'todo';
   document.getElementById('todo-due').value=t.due||'';
   document.getElementById('todo-memo').value=t.memo||'';
   document.querySelector('.todo-add-box').scrollIntoView({behavior:'smooth',block:'start'});
@@ -907,11 +911,10 @@ async function saveEditedTodo(){
   t.text=document.getElementById('todo-input').value.trim();
   t.cat=parseInt(document.getElementById('todo-cat').value);
   t.pri=parseInt(document.getElementById('todo-pri').value);
-  t.status=document.getElementById('todo-status').value;
   t.due=document.getElementById('todo-due').value||null;
   t.memo=document.getElementById('todo-memo').value.trim();
   if(SB){
-    try{await SB.from('cal_todos').update({text:t.text,cat:t.cat,pri:t.pri,status:t.status,due:t.due,memo:t.memo}).eq('id',editTodoId);}
+    try{await SB.from('cal_todos').update({text:t.text,cat:t.cat,pri:t.pri,due:t.due,memo:t.memo}).eq('id',editTodoId);}
     catch(e){console.warn('[SB] saveEditedTodo error:',e);}
   }
   saveLocal();
@@ -919,7 +922,6 @@ async function saveEditedTodo(){
   document.getElementById('todo-due').value='';
   document.getElementById('todo-memo').value='';
   document.getElementById('todo-pri').value='1';
-  document.getElementById('todo-status').value='todo';
   const btn=document.querySelector('.add-todo-btn');
   btn.innerHTML='<i class="ti ti-plus"></i> 할 일 추가';
   btn.onclick=addTodo;
