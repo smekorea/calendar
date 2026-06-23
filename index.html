@@ -1029,23 +1029,28 @@ async function deleteFromPopup(id){
 
 /* ═══ 일정 탭 (work_diary status=일정) ═══ */
 function renderList(){
-  document.getElementById('month-label').textContent=`전체 일정`;
-  // work_diary에서 '일정' 상태만 조회 (예정된 일정)
-  const schedules=diaryRecords.filter(r=>r.status==='일정').sort((a,b)=>a.date.localeCompare(b.date));
+  document.getElementById('month-label').textContent=`예정 일정`;
+  // 오늘 이후 미래 일정만 표시 (status='일정')
+  const schedules=diaryRecords
+    .filter(r=>r.status==='일정' && r.date>=todayStr)
+    .sort((a,b)=>a.date.localeCompare(b.date));
   if(!schedules.length){
-    document.getElementById('list-content').innerHTML='<div class="list-empty">등록된 일정이 없어요</div>';
+    document.getElementById('list-content').innerHTML='<div class="list-empty">예정된 일정이 없어요<br><small style="color:var(--text3)">+ 입력 버튼으로 일정을 등록하세요</small></div>';
     return;
   }
   const rows=schedules.map(r=>{
     const d=new Date(r.date+'T00:00:00');
     const lbl=lunarLabel(d.getFullYear(),d.getMonth()+1,d.getDate());
-    return `<tr>
-      <td class="lt-date">${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()} (${DAYS[d.getDay()]})<span class="lt-lunar">음력 ${lbl}</span></td>
+    const isToday=r.date===todayStr;
+    const rowStyle=isToday?'background:#FFF8E1;':'';
+    return `<tr style="${rowStyle}">
+      <td class="lt-date">${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()} (${DAYS[d.getDay()]})<span class="lt-lunar">음력 ${lbl}</span>${isToday?'<br><span style="color:#E2772E;font-size:10px;font-weight:700;">▶ 오늘</span>':''}</td>
       <td class="lt-cat"><span class="lt-cat-badge" style="background:#E3F0FF;color:#185FA5;border-color:#378ADD;">
         <span class="cat-dot" style="background:#378ADD"></span>${r.category||'일정'}</span></td>
       <td class="lt-title">${escapeHtml(r.title||r.partner||'')}</td>
       <td class="lt-memo">${r.content?escapeHtml(r.content):'<span style="color:var(--text3)">—</span>'}</td>
       <td class="lt-actions">
+        <button class="lt-action-btn" style="color:#185FA5;border-color:#378ADD;" onclick="event.stopPropagation();convertToWorkDiary('${r.id}')" title="업무일지로 전환"><i class="ti ti-transfer"></i></button>
         <button class="lt-action-btn" onclick="event.stopPropagation();editDiary('${r.id}')"><i class="ti ti-pencil"></i></button>
         <button class="lt-action-btn del" onclick="event.stopPropagation();deleteDiaryById('${r.id}');renderList();"><i class="ti ti-trash"></i></button>
       </td>
@@ -1397,10 +1402,22 @@ async function loadDiary(){
   if(!SB) return;
   showLoading(true);
   try{
-    const {data,error}=await SB.from('work_diary').select('*').order('date',{ascending:false});
-    if(error) throw error;
-    diaryRecords=data||[];
-    console.log(`[Diary] ${diaryRecords.length}건 로드`);
+    const PAGE=1000;
+    let all=[];
+    let from=0;
+    while(true){
+      const {data,error}=await SB.from('work_diary')
+        .select('*')
+        .order('date',{ascending:false})
+        .range(from, from+PAGE-1);
+      if(error) throw error;
+      if(!data||data.length===0) break;
+      all=[...all,...data];
+      if(data.length<PAGE) break;
+      from+=PAGE;
+    }
+    diaryRecords=all;
+    console.log(`[Diary] 총 ${diaryRecords.length}건 로드`);
   }catch(e){console.warn('[Diary] load error:',e);}
   showLoading(false);
 }
