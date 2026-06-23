@@ -293,6 +293,58 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
 .btn-save:hover{background:var(--accent2);}
 .btn-del{background:none;color:#E24B4A;border-color:#fbbaba;}
 .loading-bar{height:2px;background:var(--accent);position:fixed;top:0;left:0;width:0;z-index:999;transition:width .3s;}
+
+/* ── 업무일지 ── */
+.diary-panel{display:flex;flex-direction:column;height:calc(100vh - 120px);padding:10px 12px 16px;}
+.diary-filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center;}
+.diary-search{flex:1;min-width:140px;border:1px solid var(--border);border-radius:8px;
+  padding:7px 10px;font-size:var(--fs-sm);background:var(--app-bg);color:var(--text1);font-family:inherit;}
+.diary-sel{border:1px solid var(--border);border-radius:8px;padding:7px 6px;font-size:var(--fs-sm);
+  background:var(--app-bg);color:var(--text1);font-family:inherit;flex-shrink:0;}
+.diary-toggle{display:flex;align-items:center;gap:4px;font-size:var(--fs-sm);color:var(--text2);
+  cursor:pointer;flex-shrink:0;white-space:nowrap;}
+.diary-stats{font-size:11px;color:var(--text2);margin-bottom:6px;display:flex;gap:12px;flex-wrap:wrap;}
+.diary-stat-item{display:flex;align-items:center;gap:4px;}
+.diary-table-wrap{flex:1;overflow:auto;border:1.5px solid var(--border);border-radius:10px;}
+.diary-table{width:100%;border-collapse:collapse;min-width:650px;font-size:var(--fs-sm);}
+.diary-table th{background:#2c3e50;color:#fff;font-size:11px;font-weight:700;
+  padding:9px 10px;text-align:left;border-right:1px solid rgba(255,255,255,.12);white-space:nowrap;}
+.diary-table th:last-child{border-right:none;}
+.diary-table td{padding:9px 10px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);
+  vertical-align:top;color:var(--text1);}
+.diary-table td:last-child{border-right:none;}
+.diary-table tr:last-child td{border-bottom:none;}
+.diary-table tr:hover td{background:#f5f8ff;}
+.diary-table tr.worklog td{background:#fafafa;color:var(--text3);}
+.dt-date{white-space:nowrap;font-weight:700;font-size:12px;}
+.dt-date .dt-day{font-size:10px;color:var(--text3);font-weight:400;}
+.dt-cat{white-space:nowrap;}
+.dt-cat-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;
+  padding:2px 7px;border-radius:10px;font-weight:700;white-space:nowrap;}
+.dt-action{font-size:10px;color:var(--text2);white-space:nowrap;}
+.dt-partner{font-weight:600;color:var(--text1);font-size:var(--fs-sm);max-width:100px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dt-title{font-weight:600;color:#111;font-size:var(--fs-sm);}
+.dt-content{font-size:11px;color:var(--text2);margin-top:2px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.dt-imp{text-align:center;white-space:nowrap;}
+.imp-badge{font-size:10px;padding:2px 6px;border-radius:8px;font-weight:700;}
+.imp-high{background:#FFE3E3;color:#C42B2B;}
+.imp-mid{background:#FFF3D6;color:#A5760A;}
+.imp-low{background:#E9ECEF;color:#555;}
+.dt-actions{white-space:nowrap;text-align:center;}
+.dt-btn{background:none;border:1px solid var(--border);border-radius:6px;
+  width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--text2);font-size:12px;margin:1px;}
+.dt-btn:hover{background:var(--surface);}
+.dt-btn.del:hover{color:#E24B4A;border-color:#fbbaba;}
+.diary-pagination{display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:10px 0 0;flex-wrap:wrap;}
+.page-btn{border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;
+  cursor:pointer;background:none;color:var(--text1);font-family:inherit;}
+.page-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.page-btn:hover:not(.active){background:var(--surface);}
+.diary-empty{text-align:center;color:var(--text3);padding:40px 0;font-size:var(--fs-base);}
 </style>
 </head>
 <body>
@@ -314,6 +366,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
       <button class="tab active" id="tab-cal" onclick="switchTab('cal')">월간</button>
       <button class="tab" id="tab-list" onclick="switchTab('list')">리스트</button>
       <button class="tab" id="tab-todo" onclick="switchTab('todo')">할 일</button>
+      <button class="tab" id="tab-diary" onclick="switchTab('diary')">업무일지</button>
     </div>
     <div class="right-btns">
       <button class="add-btn" onclick="onAddBtnClick()"><i class="ti ti-plus"></i> 추가</button>
@@ -392,7 +445,61 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
       <div id="todo-list"></div>
     </div>
   </div>
-</div>
+
+  <!-- 업무일지 뷰 -->
+  <div id="diary-view" style="display:none;">
+    <div class="diary-panel">
+      <!-- 검색/필터 바 -->
+      <div class="diary-filter-bar">
+        <input class="diary-search" id="diary-search" placeholder="🔍 거래처, 내용 검색..." oninput="debouncedSearch()">
+        <select class="diary-sel" id="diary-cat-filter" onchange="renderDiary()">
+          <option value="">전체 유형</option>
+          <option value="영업/거래처관리">영업/거래처관리</option>
+          <option value="설비/투자">설비/투자</option>
+          <option value="출장">출장</option>
+          <option value="개발/품질">개발/품질</option>
+          <option value="사내행정">사내행정</option>
+          <option value="인사/조직">인사/조직</option>
+          <option value="근무/휴무">근무/휴무</option>
+          <option value="기타">기타</option>
+        </select>
+        <select class="diary-sel" id="diary-action-filter" onchange="renderDiary()">
+          <option value="">전체 활동</option>
+          <option value="방문/정기방문">방문</option>
+          <option value="미팅/회의">미팅/회의</option>
+          <option value="식사/라운딩">식사/라운딩</option>
+          <option value="계약/협의">계약/협의</option>
+          <option value="점검/정비/설치">점검/정비</option>
+          <option value="교육/심사/인증">교육/심사</option>
+          <option value="출장이동">출장</option>
+          <option value="행사/사내행사">행사</option>
+          <option value="서류/행정처리">서류/행정</option>
+        </select>
+        <label class="diary-toggle">
+          <input type="checkbox" id="diary-hide-worklog" checked onchange="renderDiary()">
+          <span>근태제외</span>
+        </label>
+      </div>
+      <div class="diary-stats" id="diary-stats"></div>
+      <div class="diary-table-wrap">
+        <table class="diary-table" id="diary-table">
+          <thead>
+            <tr>
+              <th style="width:90px">날짜</th>
+              <th style="width:100px">업무유형</th>
+              <th style="width:90px">활동</th>
+              <th style="width:110px">거래처</th>
+              <th>제목/내용</th>
+              <th style="width:60px">중요도</th>
+              <th style="width:70px">관리</th>
+            </tr>
+          </thead>
+          <tbody id="diary-tbody"></tbody>
+        </table>
+      </div>
+      <div class="diary-pagination" id="diary-pagination"></div>
+    </div>
+  </div>
 
 <!-- 일자별 일정 목록 팝업 -->
 <div class="day-popup-overlay" id="day-popup-overlay" onclick="if(event.target===this)closeDayPopup()">
@@ -446,6 +553,61 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeTodoModal()">취소</button>
       <button class="btn-save" id="todo-save-btn" onclick="addTodo()">추가</button>
+    </div>
+  </div>
+</div>
+
+<!-- 업무일지 추가/수정 모달 -->
+<div class="modal-overlay" id="diary-modal-overlay" onclick="if(event.target===this)closeDiaryModal()">
+  <div class="modal" style="max-width:500px;max-height:90vh;overflow-y:auto;">
+    <div class="modal-handle"></div>
+    <h3 id="diary-modal-title">업무일지 작성</h3>
+    <input type="date" id="dm-date">
+    <select id="dm-cat">
+      <option value="영업/거래처관리">영업/거래처관리</option>
+      <option value="설비/투자">설비/투자</option>
+      <option value="출장">출장</option>
+      <option value="개발/품질">개발/품질</option>
+      <option value="사내행정">사내행정</option>
+      <option value="인사/조직">인사/조직</option>
+      <option value="근무/휴무">근무/휴무</option>
+      <option value="기타">기타</option>
+    </select>
+    <select id="dm-action">
+      <option value="방문/정기방문">방문/정기방문</option>
+      <option value="미팅/회의">미팅/회의</option>
+      <option value="식사/라운딩">식사/라운딩</option>
+      <option value="계약/협의">계약/협의</option>
+      <option value="점검/정비/설치">점검/정비/설치</option>
+      <option value="교육/심사/인증">교육/심사/인증</option>
+      <option value="출장이동">출장이동</option>
+      <option value="행사/사내행사">행사/사내행사</option>
+      <option value="서류/행정처리">서류/행정처리</option>
+      <option value="인사행정">인사행정</option>
+      <option value="기타">기타</option>
+    </select>
+    <input type="text" id="dm-partner" placeholder="거래처/관련처 (예: LG전자, MSE)">
+    <input type="text" id="dm-dept" placeholder="담당부서/담당자 (예: 회로구매팀, SQE)">
+    <input type="text" id="dm-title" placeholder="제목 (핵심 한 줄 요약)">
+    <textarea id="dm-content" placeholder="내용 (상세 내용)" style="height:80px;resize:vertical;"></textarea>
+    <textarea id="dm-followup" placeholder="후속조치 (있을 경우 → 할 일 자동 생성)" style="height:48px;resize:vertical;"></textarea>
+    <div style="display:flex;gap:8px;">
+      <select id="dm-imp" style="flex:1;">
+        <option value="중" selected>중요도: 중</option>
+        <option value="상">중요도: 상</option>
+        <option value="하">중요도: 하</option>
+      </select>
+      <select id="dm-status" style="flex:1;">
+        <option value="완료" selected>완료</option>
+        <option value="진행중">진행중</option>
+        <option value="보류">보류</option>
+        <option value="후속필요">후속조치필요</option>
+      </select>
+    </div>
+    <div class="modal-btns" style="margin-top:12px;">
+      <button class="btn-cancel" onclick="closeDiaryModal()">취소</button>
+      <button id="diary-del-btn" class="btn-del" style="display:none" onclick="deleteDiary()">삭제</button>
+      <button class="btn-save" onclick="saveDiary()">저장</button>
     </div>
   </div>
 </div>
@@ -815,11 +977,17 @@ function renderAll(){
 /* ═══ 탭/월 ═══ */
 function switchTab(tab){
   currentTab=tab;
-  ['cal','list','todo'].forEach(t=>{
+  ['cal','list','todo','diary'].forEach(t=>{
     document.getElementById(t+'-view').style.display=t===tab?'':'none';
     document.getElementById('tab-'+t).classList.toggle('active',t===tab);
   });
-  renderAll();
+  if(tab==='diary') renderDiary();
+  else renderAll();
+}
+function onAddBtnClick(){
+  if(currentTab==='todo') openTodoModal();
+  else if(currentTab==='diary') openDiaryModal();
+  else openModal();
 }
 function changeMonth(d){cur.setMonth(cur.getMonth()+d);renderAll();}
 function goToday(){cur=new Date();renderAll();}
@@ -907,12 +1075,6 @@ function goToday(){cur=new Date();renderAll();}
   window.addEventListener('mouseup',onEnd);
 })();
 
-
-/* ═══ 상단 추가 버튼: 탭에 따라 다른 동작 ═══ */
-function onAddBtnClick(){
-  if(currentTab==='todo') openTodoModal();
-  else openModal();
-}
 
 /* ═══ 일정 추가/수정 모달 ═══ */
 function openModal(date){
@@ -1052,8 +1214,230 @@ async function delTodo(id){
 (async()=>{
   loadLocal();renderLegend();renderCal();
   const ok=await initSb();
-  if(ok){await loadFromSb();renderAll();}
+  if(ok){await loadFromSb();await loadDiary();renderAll();}
 })();
+
+/* ═══════════════════════════════════════
+   업무일지 (work_diary)
+═══════════════════════════════════════ */
+let diaryRecords=[];
+let diaryPage=1;
+const DIARY_PER_PAGE=30;
+let diaryEditId=null;
+let diarySearchTimer=null;
+
+// 카테고리별 색상
+const CAT_COLORS={
+  '영업/거래처관리':{bg:'#E3F0FF',color:'#1A5FA5'},
+  '설비/투자'      :{bg:'#FFF0D6',color:'#A5620A'},
+  '출장'          :{bg:'#E8F5E9',color:'#2E7D32'},
+  '개발/품질'      :{bg:'#F3E5F5',color:'#6A1B9A'},
+  '사내행정'       :{bg:'#ECEFF1',color:'#37474F'},
+  '인사/조직'      :{bg:'#FFF8E1',color:'#F57F17'},
+  '근무/휴무'      :{bg:'#F5F5F5',color:'#9E9E9E'},
+  '기타'          :{bg:'#F5F5F5',color:'#757575'},
+};
+const DAYS_KR=['일','월','화','수','목','금','토'];
+
+async function loadDiary(){
+  if(!SB) return;
+  showLoading(true);
+  try{
+    const {data,error}=await SB.from('work_diary').select('*').order('date',{ascending:false});
+    if(error) throw error;
+    diaryRecords=data||[];
+    console.log(`[Diary] ${diaryRecords.length}건 로드`);
+  }catch(e){console.warn('[Diary] load error:',e);}
+  showLoading(false);
+}
+
+function getDiaryFiltered(){
+  const search=document.getElementById('diary-search')?.value.trim().toLowerCase()||'';
+  const catF=document.getElementById('diary-cat-filter')?.value||'';
+  const actF=document.getElementById('diary-action-filter')?.value||'';
+  const hideLog=document.getElementById('diary-hide-worklog')?.checked??true;
+  return diaryRecords.filter(r=>{
+    if(hideLog && r.is_work_log) return false;
+    if(catF && r.category!==catF) return false;
+    if(actF && r.action_type!==actF) return false;
+    if(search){
+      const hay=(r.partner+r.title+r.content+r.dept_contact+r.origin).toLowerCase();
+      if(!hay.includes(search)) return false;
+    }
+    return true;
+  });
+}
+
+function renderDiary(){
+  const filtered=getDiaryFiltered();
+  const total=filtered.length;
+  const totalPages=Math.max(1,Math.ceil(total/DIARY_PER_PAGE));
+  if(diaryPage>totalPages) diaryPage=1;
+  const slice=filtered.slice((diaryPage-1)*DIARY_PER_PAGE, diaryPage*DIARY_PER_PAGE);
+
+  // 통계
+  const statEl=document.getElementById('diary-stats');
+  if(statEl){
+    const cats={};
+    filtered.forEach(r=>{cats[r.category]=(cats[r.category]||0)+1;});
+    const topCat=Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,3)
+      .map(([k,v])=>`<span class="diary-stat-item"><b>${k}</b> ${v}건</span>`).join('');
+    statEl.innerHTML=`<span>총 <b>${total}</b>건</span>${topCat}`;
+  }
+
+  // 테이블
+  const tbody=document.getElementById('diary-tbody');
+  if(!tbody) return;
+  if(!slice.length){
+    tbody.innerHTML=`<tr><td colspan="7" class="diary-empty">검색 결과가 없어요</td></tr>`;
+  } else {
+    tbody.innerHTML=slice.map(r=>{
+      const d=new Date(r.date+'T00:00:00');
+      const dayStr=`${d.getMonth()+1}/${d.getDate()} (${DAYS_KR[d.getDay()]})`;
+      const cc=CAT_COLORS[r.category]||CAT_COLORS['기타'];
+      const impCls=r.importance==='상'?'imp-high':r.importance==='하'?'imp-low':'imp-mid';
+      const isLog=r.is_work_log?'worklog':'';
+      return `<tr class="${isLog}">
+        <td class="dt-date">${dayStr}<div class="dt-day">${r.date.slice(0,4)}</div></td>
+        <td class="dt-cat"><span class="dt-cat-badge" style="background:${cc.bg};color:${cc.color};">${r.category}</span></td>
+        <td class="dt-action">${r.action_type||''}</td>
+        <td class="dt-partner" title="${escapeHtml(r.partner||'')}">${escapeHtml(r.partner||'—')}</td>
+        <td>
+          <div class="dt-title">${escapeHtml(r.title||'')}</div>
+          <div class="dt-content">${escapeHtml(r.content||'')}</div>
+          ${r.follow_up?`<div style="font-size:10px;color:#E2772E;margin-top:2px;">→ ${escapeHtml(r.follow_up)}</div>`:''}
+        </td>
+        <td class="dt-imp"><span class="imp-badge ${impCls}">${r.importance||'중'}</span></td>
+        <td class="dt-actions">
+          <button class="dt-btn" onclick="editDiary('${r.id}')"><i class="ti ti-pencil"></i></button>
+          <button class="dt-btn del" onclick="deleteDiaryById('${r.id}')"><i class="ti ti-trash"></i></button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  // 페이지네이션
+  const pagEl=document.getElementById('diary-pagination');
+  if(pagEl && totalPages>1){
+    let html='';
+    const start=Math.max(1,diaryPage-2);
+    const end=Math.min(totalPages,diaryPage+2);
+    if(diaryPage>1) html+=`<button class="page-btn" onclick="diaryGoPage(${diaryPage-1})">‹</button>`;
+    for(let i=start;i<=end;i++)
+      html+=`<button class="page-btn${i===diaryPage?' active':''}" onclick="diaryGoPage(${i})">${i}</button>`;
+    if(diaryPage<totalPages) html+=`<button class="page-btn" onclick="diaryGoPage(${diaryPage+1})">›</button>`;
+    html+=`<span style="font-size:11px;color:var(--text2);margin-left:4px;">${diaryPage}/${totalPages}p</span>`;
+    pagEl.innerHTML=html;
+  } else if(pagEl){
+    pagEl.innerHTML='';
+  }
+}
+
+function diaryGoPage(p){diaryPage=p;renderDiary();}
+function debouncedSearch(){
+  clearTimeout(diarySearchTimer);
+  diarySearchTimer=setTimeout(()=>{diaryPage=1;renderDiary();},300);
+}
+
+/* 업무일지 모달 */
+function openDiaryModal(date){
+  diaryEditId=null;
+  document.getElementById('diary-modal-title').textContent='업무일지 작성';
+  document.getElementById('dm-date').value=date||todayStr;
+  document.getElementById('dm-cat').value='영업/거래처관리';
+  document.getElementById('dm-action').value='방문/정기방문';
+  document.getElementById('dm-partner').value='';
+  document.getElementById('dm-dept').value='';
+  document.getElementById('dm-title').value='';
+  document.getElementById('dm-content').value='';
+  document.getElementById('dm-followup').value='';
+  document.getElementById('dm-imp').value='중';
+  document.getElementById('dm-status').value='완료';
+  document.getElementById('diary-del-btn').style.display='none';
+  document.getElementById('diary-modal-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('dm-partner').focus(),100);
+}
+
+function editDiary(id){
+  const r=diaryRecords.find(x=>String(x.id)===String(id));if(!r)return;
+  diaryEditId=id;
+  document.getElementById('diary-modal-title').textContent='업무일지 수정';
+  document.getElementById('dm-date').value=r.date;
+  document.getElementById('dm-cat').value=r.category||'기타';
+  document.getElementById('dm-action').value=r.action_type||'기타';
+  document.getElementById('dm-partner').value=r.partner||'';
+  document.getElementById('dm-dept').value=r.dept_contact||'';
+  document.getElementById('dm-title').value=r.title||'';
+  document.getElementById('dm-content').value=r.content||'';
+  document.getElementById('dm-followup').value=r.follow_up||'';
+  document.getElementById('dm-imp').value=r.importance||'중';
+  document.getElementById('dm-status').value=r.status||'완료';
+  document.getElementById('diary-del-btn').style.display='';
+  document.getElementById('diary-modal-overlay').classList.add('open');
+}
+
+function closeDiaryModal(){
+  document.getElementById('diary-modal-overlay').classList.remove('open');
+}
+
+async function saveDiary(){
+  const obj={
+    date: document.getElementById('dm-date').value,
+    category: document.getElementById('dm-cat').value,
+    action_type: document.getElementById('dm-action').value,
+    partner: document.getElementById('dm-partner').value.trim(),
+    dept_contact: document.getElementById('dm-dept').value.trim(),
+    title: document.getElementById('dm-title').value.trim(),
+    content: document.getElementById('dm-content').value.trim(),
+    follow_up: document.getElementById('dm-followup').value.trim(),
+    importance: document.getElementById('dm-imp').value,
+    status: document.getElementById('dm-status').value,
+    is_work_log: false,
+  };
+  if(!obj.date){alert('날짜를 입력해주세요.');return;}
+
+  if(diaryEditId){
+    const idx=diaryRecords.findIndex(x=>String(x.id)===String(diaryEditId));
+    if(idx>=0) Object.assign(diaryRecords[idx],obj);
+    if(SB){try{await SB.from('work_diary').update(obj).eq('id',diaryEditId);}catch(e){console.warn(e);}}
+  } else {
+    if(SB){
+      try{
+        const {data}=await SB.from('work_diary').insert(obj).select().single();
+        if(data) diaryRecords.unshift(data);
+      }catch(e){console.warn(e);}
+    } else {
+      diaryRecords.unshift({id:Date.now(),...obj});
+    }
+  }
+
+  // 후속조치 → 할 일 자동 생성
+  if(obj.follow_up){
+    const tobj={text:`[${obj.partner||obj.category}] ${obj.follow_up}`,cat:1,pri:0,
+      status:'todo',due:null,memo:`업무일지 후속: ${obj.date}`,
+      created_at:new Date().toISOString()};
+    if(SB){
+      try{const {data}=await SB.from('cal_todos').insert(tobj).select().single();
+        if(data) todos.unshift({id:data.id,...tobj});}
+      catch(e){todos.unshift({id:Date.now(),...tobj});}
+    } else {todos.unshift({id:Date.now(),...tobj});}
+    saveLocal();
+  }
+
+  closeDiaryModal();
+  renderDiary();
+}
+
+async function deleteDiaryById(id){
+  if(!confirm('이 업무일지를 삭제할까요?')) return;
+  diaryRecords=diaryRecords.filter(x=>String(x.id)!==String(id));
+  if(SB){try{await SB.from('work_diary').delete().eq('id',id);}catch(e){console.warn(e);}}
+  renderDiary();
+}
+async function deleteDiary(){
+  await deleteDiaryById(diaryEditId);
+  closeDiaryModal();
+}
 </script>
 <script>
 // 서비스워커가 옛 버전을 캐싱하는 문제로 인해 제거.
