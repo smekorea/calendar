@@ -1327,15 +1327,6 @@ async function delTodo(id){
   saveLocal();renderTodos();
 }
 
-/* ═══ 초기화 ═══ */
-(async()=>{
-  loadLocal();renderLegend();renderCal();
-  const ok=await initSb();
-  if(ok){await loadFromSb();await loadDiary();renderAll();}
-  // 로컬 스토리지 cal_events 정리
-  localStorage.removeItem('cal_events');
-})();
-
 /* ═══════════════════════════════════════
    업무일지 (work_diary)
 ═══════════════════════════════════════ */
@@ -1636,6 +1627,16 @@ async function deleteDiary(){
   closeDiaryModal();
 }
 </script>
+<script>
+/* ═══ 초기화 ═══ */
+(async()=>{
+  loadLocal();renderLegend();renderCal();
+  const ok=await initSb();
+  if(ok){await loadFromSb();await loadDiary();renderAll();}
+  localStorage.removeItem('cal_events');
+})();
+</script>
+
 <script>
 // 서비스워커가 옛 버전을 캐싱하는 문제로 인해 제거.
 // 이미 등록된 서비스워커가 있다면 자동으로 해제합니다.
