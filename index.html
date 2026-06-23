@@ -395,6 +395,9 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
   padding:8px 10px;font-size:var(--fs-sm);background:var(--app-bg);color:var(--text1);
   font-family:inherit;}
 .dm-input:focus{outline:none;border-color:var(--accent);}
+.dp-item-btn.convert{background:#E3F0FF;border-color:#378ADD;color:#185FA5;}
+.dp-item-btn.convert:hover{background:#378ADD;color:#fff;}
+.dp-item.dp-item-schedule{border-left:none;background:#FAFCFF;}
 </style>
 </head>
 <body>
@@ -664,9 +667,17 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
         <input type="text" id="dm-dept" class="dm-input" placeholder="예: 회로구매팀, SQE">
       </div>
       <div class="dm-field">
-        <label class="dm-label">대상부서</label>
+        <label class="dm-label">내용구분</label>
+        <select id="dm-content-type" class="dm-input" onchange="onContentTypeChange()">
+          <option value="일반기록">일반기록</option>
+          <option value="전달사항">전달사항</option>
+          <option value="지시사항">지시사항</option>
+          <option value="공유사항">공유사항</option>
+        </select>
+      </div>
+      <div class="dm-field" id="dm-target-dept-field" style="display:none;">
+        <label class="dm-label">대상부서 <span style="color:#E24B4A;font-weight:700;">*</span></label>
         <select id="dm-target-dept" class="dm-input">
-          <option value="">해당없음</option>
           <option value="전체부서">전체부서</option>
           <option value="개발기획팀">개발기획팀</option>
           <option value="자재구매팀">자재구매팀</option>
@@ -700,6 +711,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
       <div class="dm-field">
         <label class="dm-label">상태</label>
         <select id="dm-status" class="dm-input">
+          <option value="일정">일정 (달력 표시)</option>
           <option value="완료" selected>완료</option>
           <option value="진행중">진행중</option>
           <option value="보류">보류</option>
@@ -948,14 +960,20 @@ function closeDayPopup(){
   dpDate=null;
 }
 function renderDayPopupList(){
-  // work_diary에서 해당 날짜 항목 (완료 제외 또는 전체)
+  // work_diary에서 해당 날짜 항목
   const list=diaryRecords.filter(r=>r.date===dpDate);
   const el=document.getElementById('dp-list');
   if(!list.length){el.innerHTML='<div class="dp-empty">이 날짜에 등록된 일정이 없어요<br><small style="color:var(--text3)">아래 추가 버튼으로 일정을 등록하세요</small></div>';return;}
   el.innerHTML=list.map(r=>{
     const status=r.status||'완료';
     const barColor=status==='일정'?'#378ADD':status==='진행중'?'#E2772E':status==='지시'||status==='후속필요'?'#E24B4A':'#639922';
-    return `<div class="dp-item">
+    // 일정 상태인 경우 "업무일지로 전환" 버튼 표시
+    const convertBtn=status==='일정'
+      ? `<button class="dp-item-btn convert" onclick="convertToWorkDiary('${r.id}')" title="업무일지로 전환">
+           <i class="ti ti-transfer"></i>
+         </button>`
+      : '';
+    return `<div class="dp-item${status==='일정'?' dp-item-schedule':''}">
       <div class="dp-cat-bar" style="background:${barColor}"></div>
       <div class="dp-item-body">
         <div class="dp-item-title">${escapeHtml(r.title||r.partner||'')}</div>
@@ -963,6 +981,7 @@ function renderDayPopupList(){
         ${r.content?`<div class="dp-item-memo">${escapeHtml(r.content.slice(0,80))}${r.content.length>80?'...':''}</div>`:''}
       </div>
       <div class="dp-item-actions">
+        ${convertBtn}
         <button class="dp-item-btn" onclick="editDiary('${r.id}');closeDayPopup();"><i class="ti ti-pencil"></i></button>
         <button class="dp-item-btn del" onclick="deleteFromPopup('${r.id}')"><i class="ti ti-trash"></i></button>
       </div>
@@ -973,9 +992,32 @@ function escapeHtml(s){
   const d=document.createElement('div');d.textContent=s;return d.innerHTML;
 }
 function openModalFromPopup(){
-  // 팝업에서 추가 → 업무일지 모달 열기 (날짜 기본값 설정)
   closeDayPopup();
   openDiaryModal(dpDate);
+}
+// 일정 → 업무일지 전환
+function convertToWorkDiary(id){
+  const r=diaryRecords.find(x=>String(x.id)===String(id));
+  if(!r) return;
+  closeDayPopup();
+  // 기존 일정 내용을 채운 채로 모달 열기
+  diaryEditId=id;
+  document.getElementById('diary-modal-title').textContent='업무일지 전환 (일정 → 기록)';
+  document.getElementById('dm-date').value=r.date;
+  document.getElementById('dm-cat').value=r.category||'사내행정';
+  document.getElementById('dm-action').value=r.action_type||'미팅/회의';
+  document.getElementById('dm-partner').value=r.partner||'';
+  document.getElementById('dm-dept').value=r.dept_contact||'';
+  document.getElementById('dm-content-type').value=r.content_type||'일반기록';
+  onContentTypeChange();
+  document.getElementById('dm-target-dept').value=r.target_dept||'';
+  document.getElementById('dm-title').value=r.title||'';
+  document.getElementById('dm-content').value=r.content||'';
+  document.getElementById('dm-followup').value=r.follow_up||'';
+  document.getElementById('dm-imp').value=r.importance||'중';
+  document.getElementById('dm-status').value='완료'; // 기본값: 완료로 전환
+  document.getElementById('diary-del-btn').style.display='';
+  document.getElementById('diary-modal-overlay').classList.add('open');
 }
 async function deleteFromPopup(id){
   diaryRecords=diaryRecords.filter(r=>String(r.id)!==String(id));
@@ -1525,6 +1567,14 @@ function debouncedSearch(){
 }
 
 /* 업무일지 모달 */
+// 내용구분 변경 시 대상부서 필드 토글
+function onContentTypeChange(){
+  const ct=document.getElementById('dm-content-type').value;
+  const needDept=['전달사항','지시사항','공유사항'].includes(ct);
+  const field=document.getElementById('dm-target-dept-field');
+  if(field) field.style.display=needDept?'':'none';
+}
+
 function openDiaryModal(date){
   diaryEditId=null;
   document.getElementById('diary-modal-title').textContent='업무일지 작성';
@@ -1533,6 +1583,8 @@ function openDiaryModal(date){
   document.getElementById('dm-action').value='방문/정기방문';
   document.getElementById('dm-partner').value='';
   document.getElementById('dm-dept').value='';
+  document.getElementById('dm-content-type').value='일반기록';
+  onContentTypeChange();
   document.getElementById('dm-target-dept').value='';
   document.getElementById('dm-title').value='';
   document.getElementById('dm-content').value='';
@@ -1544,6 +1596,14 @@ function openDiaryModal(date){
   setTimeout(()=>document.getElementById('dm-partner').focus(),100);
 }
 
+function openDiaryModalAsSchedule(date){
+  // 달력에서 일정 등록 시 status='일정'으로 기본값 설정
+  openDiaryModal(date);
+  document.getElementById('dm-status').value='일정';
+  document.getElementById('dm-cat').value='사내행정';
+  document.getElementById('dm-action').value='미팅/회의';
+}
+
 function editDiary(id){
   const r=diaryRecords.find(x=>String(x.id)===String(id));if(!r)return;
   diaryEditId=id;
@@ -1553,6 +1613,8 @@ function editDiary(id){
   document.getElementById('dm-action').value=r.action_type||'기타';
   document.getElementById('dm-partner').value=r.partner||'';
   document.getElementById('dm-dept').value=r.dept_contact||'';
+  document.getElementById('dm-content-type').value=r.content_type||'일반기록';
+  onContentTypeChange();
   document.getElementById('dm-target-dept').value=r.target_dept||'';
   document.getElementById('dm-title').value=r.title||'';
   document.getElementById('dm-content').value=r.content||'';
@@ -1574,6 +1636,7 @@ async function saveDiary(){
     action_type: document.getElementById('dm-action').value,
     partner: document.getElementById('dm-partner').value.trim(),
     dept_contact: document.getElementById('dm-dept').value.trim(),
+    content_type: document.getElementById('dm-content-type').value,
     target_dept: document.getElementById('dm-target-dept').value,
     title: document.getElementById('dm-title').value.trim(),
     content: document.getElementById('dm-content').value.trim(),
