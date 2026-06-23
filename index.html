@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PJY 업무관리</title>
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
@@ -150,7 +150,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
   .more-chip{font-size:10px;padding:0 4px;}
 }
 
-/* ── 리스트 뷰 (전체 일정, 날짜순 단일 테이블) ── */
+/* ── 일정 탭 (예정 일정 목록) ── */
 .list-wrap{padding:10px 16px 80px;}
 .list-table-wrap{border:1.5px solid var(--border);border-radius:10px;overflow:auto;}
 .list-table{width:100%;border-collapse:collapse;min-width:560px;}
@@ -398,6 +398,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
 .dp-item-btn.convert{background:#E3F0FF;border-color:#378ADD;color:#185FA5;}
 .dp-item-btn.convert:hover{background:#378ADD;color:#fff;}
 .dp-item.dp-item-schedule{border-left:none;background:#FAFCFF;}
+.add-option{color:var(--accent);font-weight:700;}
+.dt-title-cell{font-weight:700;font-size:13px;color:#111;white-space:nowrap;max-width:140px;overflow:hidden;text-overflow:ellipsis;}
 </style>
 </head>
 <body>
@@ -417,11 +419,11 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
     </div>
     <div class="tabs">
       <button class="tab active" id="tab-cal" onclick="switchTab('cal')">월간</button>
-      <button class="tab" id="tab-list" onclick="switchTab('list')">리스트</button>
+      <button class="tab" id="tab-list" onclick="switchTab('list')">일정</button>
       <button class="tab" id="tab-diary" onclick="switchTab('diary')">업무일지</button>
     </div>
     <div class="right-btns">
-      <button class="add-btn" onclick="onAddBtnClick()"><i class="ti ti-plus"></i> 추가</button>
+      <button class="add-btn" onclick="onAddBtnClick()"><i class="ti ti-plus"></i> 입력</button>
       <button class="settings-btn" id="settings-btn" onclick="toggleSettings()"><i class="ti ti-settings"></i></button>
     </div>
   </div>
@@ -549,7 +551,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
               <th class="resizable" style="width:85px" data-col="2">활동</th>
               <th class="resizable" style="width:90px" data-col="3">거래처</th>
               <th class="resizable" style="width:80px" data-col="4">대상부서</th>
-              <th class="resizable" style="min-width:160px" data-col="5">제목 / 내용</th>
+              <th class="resizable" style="width:140px" data-col="5">제목</th>
+              <th class="resizable" style="min-width:160px" data-col="6">내용</th>
               <th class="resizable" style="width:55px" data-col="6">중요도</th>
               <th class="resizable" style="width:65px" data-col="7">상태</th>
               <th style="width:60px">관리</th>
@@ -629,31 +632,30 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
       </div>
       <div class="dm-field">
         <label class="dm-label">업무유형</label>
-        <select id="dm-cat" class="dm-input">
-          <option value="영업/거래처관리">영업/거래처관리</option>
+        <select id="dm-cat" class="dm-input" onchange="onSelectAddNew(this,'category')">
+          <option value="영업/거래처">영업/거래처</option>
           <option value="설비/투자">설비/투자</option>
-          <option value="출장">출장</option>
           <option value="개발/품질">개발/품질</option>
-          <option value="사내행정">사내행정</option>
+          <option value="사내관리">사내관리</option>
           <option value="인사/조직">인사/조직</option>
-          <option value="근무/휴무">근무/휴무</option>
-          <option value="기타">기타</option>
+          <option value="출장">출장</option>
+          <option value="개인업무">개인업무</option>
+          <option value="__add__" class="add-option">＋ 항목 추가</option>
         </select>
       </div>
       <div class="dm-field">
         <label class="dm-label">활동유형</label>
-        <select id="dm-action" class="dm-input">
-          <option value="방문/정기방문">방문/정기방문</option>
+        <select id="dm-action" class="dm-input" onchange="onSelectAddNew(this,'action_type')">
+          <option value="방문">방문</option>
           <option value="미팅/회의">미팅/회의</option>
-          <option value="식사/라운딩">식사/라운딩</option>
+          <option value="식사/접대">식사/접대</option>
+          <option value="라운딩">라운딩</option>
           <option value="계약/협의">계약/협의</option>
-          <option value="점검/정비/설치">점검/정비/설치</option>
-          <option value="교육/심사/인증">교육/심사/인증</option>
-          <option value="출장이동">출장이동</option>
-          <option value="행사/사내행사">행사/사내행사</option>
-          <option value="서류/행정처리">서류/행정처리</option>
-          <option value="인사행정">인사행정</option>
-          <option value="기타">기타</option>
+          <option value="점검/정비">점검/정비</option>
+          <option value="교육/심사">교육/심사</option>
+          <option value="행사">행사</option>
+          <option value="행정처리">행정처리</option>
+          <option value="__add__" class="add-option">＋ 항목 추가</option>
         </select>
       </div>
     </div>
@@ -668,11 +670,11 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
       </div>
       <div class="dm-field">
         <label class="dm-label">내용구분</label>
-        <select id="dm-content-type" class="dm-input" onchange="onContentTypeChange()">
+        <select id="dm-content-type" class="dm-input" onchange="onContentTypeChange();onSelectAddNew(this,'content_type')">
           <option value="일반기록">일반기록</option>
           <option value="전달사항">전달사항</option>
           <option value="지시사항">지시사항</option>
-          <option value="공유사항">공유사항</option>
+          <option value="__add__" class="add-option">＋ 항목 추가</option>
         </select>
       </div>
       <div class="dm-field" id="dm-target-dept-field" style="display:none;">
@@ -1025,7 +1027,7 @@ async function deleteFromPopup(id){
   renderDayPopupList();renderAll();
 }
 
-/* ═══ 리스트 뷰 (work_diary '일정' 기반) ═══ */
+/* ═══ 일정 탭 (work_diary status=일정) ═══ */
 function renderList(){
   document.getElementById('month-label').textContent=`전체 일정`;
   // work_diary에서 '일정' 상태만 조회 (예정된 일정)
@@ -1180,7 +1182,7 @@ function goToday(){cur=new Date();renderAll();}
       daysEl.style.transform=`translateX(${deltaX>0?60:-60}px)`;
       daysEl.style.opacity='0';
       setTimeout(()=>{
-        changeMonth(deltaX>0?1:-1);
+        changeMonth(deltaX>0?-1:1);
         daysEl.style.transition='none';
         daysEl.style.transform='translateX(0)';
         daysEl.style.opacity='1';
@@ -1411,7 +1413,9 @@ function getDiaryFiltered(){
   const catF=document.getElementById('diary-cat-filter')?.value||'';
   const statusF=document.getElementById('diary-status-filter')?.value||'';
   const deptF=document.getElementById('diary-dept-filter')?.value||'';
+  // 상태 필터가 없을 때 기본적으로 '일정' 상태 숨김
   return diaryRecords.filter(r=>{
+    if(!statusF && r.status==='일정') return false;
     if(catF && r.category!==catF) return false;
     if(statusF && r.status!==statusF) return false;
     if(deptF && r.target_dept!==deptF) return false;
@@ -1526,8 +1530,8 @@ function renderDiary(){
         <td class="dt-action">${r.action_type||''}</td>
         <td class="dt-partner">${escapeHtml(r.partner||'—')}</td>
         <td class="dt-dept-cell">${escapeHtml(r.target_dept||'')}</td>
+        <td class="dt-title-cell">${escapeHtml(r.title||'')}</td>
         <td>
-          <div class="dt-title">${escapeHtml(r.title||'')}</div>
           <div class="dt-content">${escapeHtml(r.content||'')}</div>
           ${r.follow_up?`<div class="dt-followup">→ ${escapeHtml(r.follow_up)}</div>`:''}
         </td>
@@ -1567,10 +1571,93 @@ function debouncedSearch(){
 }
 
 /* 업무일지 모달 */
+/* ═══ 사용자 정의 유형 관리 ═══ */
+let userCategories={category:[],action_type:[],content_type:[]};
+
+async function loadUserCategories(){
+  if(!SB) return;
+  try{
+    const {data}=await SB.from('user_categories').select('*').order('created_at');
+    if(data){
+      userCategories={category:[],action_type:[],content_type:[]};
+      data.forEach(r=>{
+        if(userCategories[r.type]) userCategories[r.type].push(r.value);
+      });
+      applyUserCategories();
+    }
+  }catch(e){console.warn('[UC] load error:',e);}
+}
+
+function applyUserCategories(){
+  // 업무유형 추가 항목 삽입
+  const catSel=document.getElementById('dm-cat');
+  if(catSel){
+    const addOpt=catSel.querySelector('option[value="__add__"]');
+    userCategories.category.forEach(v=>{
+      if(!catSel.querySelector(`option[value="${v}"]`)){
+        const opt=document.createElement('option');
+        opt.value=v;opt.textContent=v;
+        catSel.insertBefore(opt, addOpt);
+      }
+    });
+  }
+  // 활동유형 추가 항목 삽입
+  const actSel=document.getElementById('dm-action');
+  if(actSel){
+    const addOpt=actSel.querySelector('option[value="__add__"]');
+    userCategories.action_type.forEach(v=>{
+      if(!actSel.querySelector(`option[value="${v}"]`)){
+        const opt=document.createElement('option');
+        opt.value=v;opt.textContent=v;
+        actSel.insertBefore(opt, addOpt);
+      }
+    });
+  }
+  // 내용구분 추가 항목 삽입
+  const ctSel=document.getElementById('dm-content-type');
+  if(ctSel){
+    const addOpt=ctSel.querySelector('option[value="__add__"]');
+    userCategories.content_type.forEach(v=>{
+      if(!ctSel.querySelector(`option[value="${v}"]`)){
+        const opt=document.createElement('option');
+        opt.value=v;opt.textContent=v;
+        ctSel.insertBefore(opt, addOpt);
+      }
+    });
+  }
+}
+
+async function onSelectAddNew(sel, type){
+  if(sel.value!=='__add__') return;
+  const label=type==='category'?'업무유형':type==='action_type'?'활동유형':'내용구분';
+  const newVal=prompt(`새 ${label} 항목을 입력하세요:`);
+  if(!newVal||!newVal.trim()){
+    sel.selectedIndex=0;return;
+  }
+  const v=newVal.trim();
+  // 이미 있는지 확인
+  if(sel.querySelector(`option[value="${v}"]`)){
+    sel.value=v;return;
+  }
+  // Supabase 저장
+  if(SB){
+    try{
+      await SB.from('user_categories').insert({type,value:v});
+    }catch(e){console.warn('[UC] insert error:',e);}
+  }
+  userCategories[type].push(v);
+  // 셀렉트에 추가
+  const addOpt=sel.querySelector('option[value="__add__"]');
+  const opt=document.createElement('option');
+  opt.value=v;opt.textContent=v;
+  sel.insertBefore(opt, addOpt);
+  sel.value=v;
+}
+
 // 내용구분 변경 시 대상부서 필드 토글
-function onContentTypeChange(){
+function onContentTypeChange(){\u0020
   const ct=document.getElementById('dm-content-type').value;
-  const needDept=['전달사항','지시사항','공유사항'].includes(ct);
+  const needDept=['전달사항','지시사항'].includes(ct);
   const field=document.getElementById('dm-target-dept-field');
   if(field) field.style.display=needDept?'':'none';
 }
@@ -1695,7 +1782,12 @@ async function deleteDiary(){
 (async()=>{
   loadLocal();renderLegend();renderCal();
   const ok=await initSb();
-  if(ok){await loadFromSb();await loadDiary();renderAll();}
+  if(ok){
+    await loadFromSb();
+    await loadDiary();
+    await loadUserCategories();
+    renderAll();
+  }
   localStorage.removeItem('cal_events');
 })();
 </script>
