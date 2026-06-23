@@ -1655,7 +1655,7 @@ async function onSelectAddNew(sel, type){
 }
 
 // 내용구분 변경 시 대상부서 필드 토글
-function onContentTypeChange(){\u0020
+function onContentTypeChange(){
   const ct=document.getElementById('dm-content-type').value;
   const needDept=['전달사항','지시사항'].includes(ct);
   const field=document.getElementById('dm-target-dept-field');
