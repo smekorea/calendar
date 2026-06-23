@@ -306,32 +306,41 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
 .diary-stats{font-size:11px;color:var(--text2);margin-bottom:6px;display:flex;gap:12px;flex-wrap:wrap;}
 .diary-stat-item{display:flex;align-items:center;gap:4px;}
 .diary-table-wrap{flex:1;overflow:auto;border:1.5px solid var(--border);border-radius:10px;}
-.diary-table{width:100%;border-collapse:collapse;min-width:650px;font-size:var(--fs-sm);}
-.diary-table th{background:#2c3e50;color:#fff;font-size:11px;font-weight:700;
+.diary-table{width:100%;border-collapse:collapse;min-width:700px;font-size:13px;}
+.diary-table th{background:#2c3e50;color:#fff;font-size:12px;font-weight:700;
   padding:9px 10px;text-align:left;border-right:1px solid rgba(255,255,255,.12);white-space:nowrap;}
 .diary-table th:last-child{border-right:none;}
-.diary-table td{padding:9px 10px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);
-  vertical-align:top;color:var(--text1);}
+.diary-table td{padding:8px 10px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);
+  vertical-align:top;color:var(--text1);font-size:13px;}
 .diary-table td:last-child{border-right:none;}
 .diary-table tr:last-child td{border-bottom:none;}
 .diary-table tr:hover td{background:#f5f8ff;}
+.diary-table tr.status-진행중 td{background:#fff8f0;}
+.diary-table tr.status-후속필요 td{background:#fff3f3;}
+.diary-table tr.status-지시 td{background:#fff0f0;}
+.diary-table tr.status-보류 td{background:#f8f8f8;}
 .diary-table tr.worklog td{background:#fafafa;color:var(--text3);}
-.dt-date{white-space:nowrap;font-weight:700;font-size:12px;}
-.dt-date .dt-day{font-size:10px;color:var(--text3);font-weight:400;}
-.dt-cat{white-space:nowrap;}
-.dt-cat-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;
-  padding:2px 7px;border-radius:10px;font-weight:700;white-space:nowrap;}
-.dt-action{font-size:10px;color:var(--text2);white-space:nowrap;}
-.dt-partner{font-weight:600;color:var(--text1);font-size:var(--fs-sm);max-width:100px;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.dt-title{font-weight:600;color:#111;font-size:var(--fs-sm);}
-.dt-content{font-size:11px;color:var(--text2);margin-top:2px;
+.dt-date{white-space:nowrap;font-weight:700;font-size:13px;}
+.dt-cat{font-size:13px;font-weight:600;color:var(--text1);white-space:nowrap;}
+.dt-action{font-size:13px;color:var(--text2);white-space:nowrap;}
+.dt-partner{font-weight:600;font-size:13px;color:var(--text1);}
+.dt-dept-cell{font-size:13px;color:var(--text2);}
+.dt-title{font-weight:700;font-size:13px;color:#111;margin-bottom:3px;}
+.dt-content{font-size:12px;color:var(--text2);
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.dt-imp{text-align:center;white-space:nowrap;}
-.imp-badge{font-size:10px;padding:2px 6px;border-radius:8px;font-weight:700;}
+.dt-followup{font-size:11px;color:#E2772E;margin-top:3px;font-weight:600;}
+.dt-imp{text-align:center;}
+.imp-badge{font-size:12px;padding:2px 6px;border-radius:6px;font-weight:700;}
 .imp-high{background:#FFE3E3;color:#C42B2B;}
 .imp-mid{background:#FFF3D6;color:#A5760A;}
 .imp-low{background:#E9ECEF;color:#555;}
+.dt-status{white-space:nowrap;}
+.status-badge{font-size:11px;padding:2px 7px;border-radius:6px;font-weight:700;display:inline-block;}
+.sb-완료{background:#E8F5E9;color:#2E7D32;}
+.sb-진행중{background:#FFF3E0;color:#E65100;}
+.sb-보류{background:#ECEFF1;color:#546E7A;}
+.sb-후속필요{background:#FCE4EC;color:#C62828;}
+.sb-지시{background:#FFEBEE;color:#B71C1C;}
 .dt-actions{white-space:nowrap;text-align:center;}
 .dt-btn{background:none;border:1px solid var(--border);border-radius:6px;
   width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;
@@ -347,14 +356,18 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
 .diary-empty{text-align:center;color:var(--text3);padding:40px 0;font-size:var(--fs-base);}
 
 /* 키워드 검색 */
-.diary-keywords{display:flex;gap:4px;flex:1;min-width:200px;}
-.diary-kw{flex:1;min-width:60px;border:1px solid var(--border);border-radius:8px;
-  padding:7px 8px;font-size:var(--fs-sm);background:var(--app-bg);color:var(--text1);font-family:inherit;}
+.diary-filter-bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px;}
+.diary-kw{flex:1;min-width:50px;max-width:120px;border:1px solid var(--border);border-radius:8px;
+  padding:6px 8px;font-size:var(--fs-sm);background:var(--app-bg);color:var(--text1);font-family:inherit;}
 .diary-kw:focus{outline:none;border-color:var(--accent);}
+.diary-search-btn{background:var(--accent);border:none;border-radius:8px;
+  padding:0 12px;height:32px;font-size:var(--fs-sm);cursor:pointer;color:#fff;
+  font-family:inherit;display:flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;}
+.diary-search-btn:hover{background:var(--accent2);}
 
 /* 다운로드 버튼 */
 .diary-dl-btn{background:none;border:1px solid var(--border);border-radius:8px;
-  padding:0 12px;height:34px;font-size:var(--fs-sm);cursor:pointer;color:var(--text1);
+  padding:0 10px;height:32px;font-size:var(--fs-sm);cursor:pointer;color:var(--text1);
   font-family:inherit;display:flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;}
 .diary-dl-btn:hover{background:var(--surface);}
 
@@ -363,6 +376,25 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
 .col-resizer{position:absolute;right:0;top:0;width:6px;height:100%;cursor:col-resize;
   background:transparent;z-index:1;}
 .col-resizer:hover,.col-resizer.dragging{background:rgba(255,255,255,.3);}
+
+/* 업무일지 확장 모달 */
+.diary-modal{
+  background:var(--app-bg);border-radius:16px 16px 0 0;
+  padding:20px;width:100%;
+  max-height:92vh;overflow-y:auto;
+  border-top:1px solid var(--border);
+}
+@media(min-width:521px){
+  .diary-modal{border-radius:14px;width:min(720px,95vw);border:1px solid var(--border);}
+}
+.dm-row{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.dm-field{flex:1;min-width:140px;display:flex;flex-direction:column;gap:4px;}
+.dm-field-full{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+.dm-label{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.3px;}
+.dm-input{width:100%;border:1px solid var(--border);border-radius:8px;
+  padding:8px 10px;font-size:var(--fs-sm);background:var(--app-bg);color:var(--text1);
+  font-family:inherit;}
+.dm-input:focus{outline:none;border-color:var(--accent);}
 </style>
 </head>
 <body>
@@ -466,41 +498,41 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
   <!-- 업무일지 뷰 -->
   <div id="diary-view" style="display:none;">
     <div class="diary-panel">
-      <!-- 검색/필터 바 -->
+      <!-- 검색/필터 바 (한 줄) -->
       <div class="diary-filter-bar">
-        <div class="diary-keywords">
-          <input class="diary-kw" id="diary-kw1" placeholder="키워드1" oninput="debouncedSearch()">
-          <input class="diary-kw" id="diary-kw2" placeholder="키워드2" oninput="debouncedSearch()">
-          <input class="diary-kw" id="diary-kw3" placeholder="키워드3" oninput="debouncedSearch()">
-        </div>
+        <input class="diary-kw" id="diary-kw1" placeholder="키워드1" onkeydown="if(event.key==='Enter')searchDiary()">
+        <input class="diary-kw" id="diary-kw2" placeholder="키워드2" onkeydown="if(event.key==='Enter')searchDiary()">
+        <input class="diary-kw" id="diary-kw3" placeholder="키워드3" onkeydown="if(event.key==='Enter')searchDiary()">
+        <button class="diary-search-btn" onclick="searchDiary()"><i class="ti ti-search"></i> 조회</button>
         <select class="diary-sel" id="diary-cat-filter" onchange="renderDiary()">
           <option value="">전체 유형</option>
-          <option value="영업/거래처관리">영업/거래처관리</option>
+          <option value="영업/거래처관리">영업/거래처</option>
           <option value="설비/투자">설비/투자</option>
           <option value="출장">출장</option>
           <option value="개발/품질">개발/품질</option>
           <option value="사내행정">사내행정</option>
           <option value="인사/조직">인사/조직</option>
-          <option value="근무/휴무">근무/휴무</option>
+          <option value="일정">일정</option>
           <option value="기타">기타</option>
         </select>
-        <select class="diary-sel" id="diary-action-filter" onchange="renderDiary()">
-          <option value="">전체 활동</option>
-          <option value="방문/정기방문">방문</option>
-          <option value="미팅/회의">미팅/회의</option>
-          <option value="식사/라운딩">식사/라운딩</option>
-          <option value="계약/협의">계약/협의</option>
-          <option value="점검/정비/설치">점검/정비</option>
-          <option value="교육/심사/인증">교육/심사</option>
-          <option value="출장이동">출장</option>
-          <option value="행사/사내행사">행사</option>
-          <option value="서류/행정처리">서류/행정</option>
+        <select class="diary-sel" id="diary-status-filter" onchange="renderDiary()">
+          <option value="">전체 상태</option>
+          <option value="일정">일정</option>
+          <option value="완료">완료</option>
+          <option value="진행중">진행중</option>
+          <option value="보류">보류</option>
+          <option value="후속필요">후속필요</option>
+          <option value="지시">지시</option>
         </select>
-        <label class="diary-toggle">
-          <input type="checkbox" id="diary-hide-worklog" checked onchange="renderDiary()">
-          <span>근태제외</span>
-        </label>
-        <button class="diary-dl-btn" onclick="downloadDiary()" title="엑셀 다운로드">
+        <select class="diary-sel" id="diary-dept-filter" onchange="renderDiary()">
+          <option value="">전체부서</option>
+          <option value="개발기획팀">개발기획팀</option>
+          <option value="자재구매팀">자재구매팀</option>
+          <option value="제조팀">제조팀</option>
+          <option value="출하팀">출하팀</option>
+          <option value="재경팀">재경팀</option>
+        </select>
+        <button class="diary-dl-btn" onclick="downloadDiary()">
           <i class="ti ti-download"></i> 다운로드
         </button>
       </div>
@@ -509,13 +541,15 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
         <table class="diary-table" id="diary-table">
           <thead>
             <tr>
-              <th class="resizable" style="width:90px" data-col="0">날짜</th>
-              <th class="resizable" style="width:110px" data-col="1">업무유형</th>
-              <th class="resizable" style="width:90px" data-col="2">활동</th>
-              <th class="resizable" style="width:110px" data-col="3">거래처</th>
-              <th class="resizable" style="width:auto" data-col="4">제목/내용</th>
-              <th class="resizable" style="width:60px" data-col="5">중요도</th>
-              <th style="width:70px">관리</th>
+              <th class="resizable" style="width:80px" data-col="0">날짜</th>
+              <th class="resizable" style="width:100px" data-col="1">업무유형</th>
+              <th class="resizable" style="width:85px" data-col="2">활동</th>
+              <th class="resizable" style="width:90px" data-col="3">거래처</th>
+              <th class="resizable" style="width:80px" data-col="4">대상부서</th>
+              <th class="resizable" style="min-width:160px" data-col="5">제목 / 내용</th>
+              <th class="resizable" style="width:55px" data-col="6">중요도</th>
+              <th class="resizable" style="width:65px" data-col="7">상태</th>
+              <th style="width:60px">관리</th>
             </tr>
           </thead>
           <tbody id="diary-tbody"></tbody>
@@ -524,19 +558,6 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
       <div class="diary-pagination" id="diary-pagination"></div>
     </div>
   </div>
-              <th style="width:110px">거래처</th>
-              <th>제목/내용</th>
-              <th style="width:60px">중요도</th>
-              <th style="width:70px">관리</th>
-            </tr>
-          </thead>
-          <tbody id="diary-tbody"></tbody>
-        </table>
-      </div>
-      <div class="diary-pagination" id="diary-pagination"></div>
-    </div>
-  </div>
-
 <!-- 일자별 일정 목록 팝업 -->
 <div class="day-popup-overlay" id="day-popup-overlay" onclick="if(event.target===this)closeDayPopup()">
   <div class="day-popup">
@@ -595,52 +616,99 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
 
 <!-- 업무일지 추가/수정 모달 -->
 <div class="modal-overlay" id="diary-modal-overlay" onclick="if(event.target===this)closeDiaryModal()">
-  <div class="modal" style="max-width:500px;max-height:90vh;overflow-y:auto;">
+  <div class="diary-modal">
     <div class="modal-handle"></div>
     <h3 id="diary-modal-title">업무일지 작성</h3>
-    <input type="date" id="dm-date">
-    <select id="dm-cat">
-      <option value="영업/거래처관리">영업/거래처관리</option>
-      <option value="설비/투자">설비/투자</option>
-      <option value="출장">출장</option>
-      <option value="개발/품질">개발/품질</option>
-      <option value="사내행정">사내행정</option>
-      <option value="인사/조직">인사/조직</option>
-      <option value="근무/휴무">근무/휴무</option>
-      <option value="기타">기타</option>
-    </select>
-    <select id="dm-action">
-      <option value="방문/정기방문">방문/정기방문</option>
-      <option value="미팅/회의">미팅/회의</option>
-      <option value="식사/라운딩">식사/라운딩</option>
-      <option value="계약/협의">계약/협의</option>
-      <option value="점검/정비/설치">점검/정비/설치</option>
-      <option value="교육/심사/인증">교육/심사/인증</option>
-      <option value="출장이동">출장이동</option>
-      <option value="행사/사내행사">행사/사내행사</option>
-      <option value="서류/행정처리">서류/행정처리</option>
-      <option value="인사행정">인사행정</option>
-      <option value="기타">기타</option>
-    </select>
-    <input type="text" id="dm-partner" placeholder="거래처/관련처 (예: LG전자, MSE)">
-    <input type="text" id="dm-dept" placeholder="담당부서/담당자 (예: 회로구매팀, SQE)">
-    <input type="text" id="dm-title" placeholder="제목 (핵심 한 줄 요약)">
-    <textarea id="dm-content" placeholder="내용 (상세 내용)" style="height:80px;resize:vertical;"></textarea>
-    <textarea id="dm-followup" placeholder="후속조치 (있을 경우 → 할 일 자동 생성)" style="height:48px;resize:vertical;"></textarea>
-    <div style="display:flex;gap:8px;">
-      <select id="dm-imp" style="flex:1;">
-        <option value="중" selected>중요도: 중</option>
-        <option value="상">중요도: 상</option>
-        <option value="하">중요도: 하</option>
-      </select>
-      <select id="dm-status" style="flex:1;">
-        <option value="완료" selected>완료</option>
-        <option value="진행중">진행중</option>
-        <option value="보류">보류</option>
-        <option value="후속필요">후속조치필요</option>
-      </select>
+    <div class="dm-row">
+      <div class="dm-field">
+        <label class="dm-label">날짜</label>
+        <input type="date" id="dm-date" class="dm-input">
+      </div>
+      <div class="dm-field">
+        <label class="dm-label">업무유형</label>
+        <select id="dm-cat" class="dm-input">
+          <option value="영업/거래처관리">영업/거래처관리</option>
+          <option value="설비/투자">설비/투자</option>
+          <option value="출장">출장</option>
+          <option value="개발/품질">개발/품질</option>
+          <option value="사내행정">사내행정</option>
+          <option value="인사/조직">인사/조직</option>
+          <option value="근무/휴무">근무/휴무</option>
+          <option value="기타">기타</option>
+        </select>
+      </div>
+      <div class="dm-field">
+        <label class="dm-label">활동유형</label>
+        <select id="dm-action" class="dm-input">
+          <option value="방문/정기방문">방문/정기방문</option>
+          <option value="미팅/회의">미팅/회의</option>
+          <option value="식사/라운딩">식사/라운딩</option>
+          <option value="계약/협의">계약/협의</option>
+          <option value="점검/정비/설치">점검/정비/설치</option>
+          <option value="교육/심사/인증">교육/심사/인증</option>
+          <option value="출장이동">출장이동</option>
+          <option value="행사/사내행사">행사/사내행사</option>
+          <option value="서류/행정처리">서류/행정처리</option>
+          <option value="인사행정">인사행정</option>
+          <option value="기타">기타</option>
+        </select>
+      </div>
     </div>
-    <div class="modal-btns" style="margin-top:12px;">
+    <div class="dm-row">
+      <div class="dm-field">
+        <label class="dm-label">거래처/관련처</label>
+        <input type="text" id="dm-partner" class="dm-input" placeholder="예: LG전자, MSE">
+      </div>
+      <div class="dm-field">
+        <label class="dm-label">담당부서/담당자</label>
+        <input type="text" id="dm-dept" class="dm-input" placeholder="예: 회로구매팀, SQE">
+      </div>
+      <div class="dm-field">
+        <label class="dm-label">대상부서</label>
+        <select id="dm-target-dept" class="dm-input">
+          <option value="">해당없음</option>
+          <option value="전체부서">전체부서</option>
+          <option value="개발기획팀">개발기획팀</option>
+          <option value="자재구매팀">자재구매팀</option>
+          <option value="제조팀">제조팀</option>
+          <option value="출하팀">출하팀</option>
+          <option value="재경팀">재경팀</option>
+        </select>
+      </div>
+    </div>
+    <div class="dm-field-full">
+      <label class="dm-label">제목 <span style="color:var(--text3);font-weight:400;">(핵심 한 줄 요약)</span></label>
+      <input type="text" id="dm-title" class="dm-input" placeholder="예: LG전자 ES제어개발팀 정기방문">
+    </div>
+    <div class="dm-field-full">
+      <label class="dm-label">내용</label>
+      <textarea id="dm-content" class="dm-input" placeholder="상세 내용 작성..." style="height:90px;resize:vertical;"></textarea>
+    </div>
+    <div class="dm-field-full">
+      <label class="dm-label">후속조치 <span style="color:#E2772E;font-weight:400;">(입력 시 할 일 자동 생성)</span></label>
+      <textarea id="dm-followup" class="dm-input" placeholder="후속조치 내용..." style="height:52px;resize:vertical;"></textarea>
+    </div>
+    <div class="dm-row">
+      <div class="dm-field">
+        <label class="dm-label">중요도</label>
+        <select id="dm-imp" class="dm-input">
+          <option value="중" selected>중</option>
+          <option value="상">상</option>
+          <option value="하">하</option>
+        </select>
+      </div>
+      <div class="dm-field">
+        <label class="dm-label">상태</label>
+        <select id="dm-status" class="dm-input">
+          <option value="완료" selected>완료</option>
+          <option value="진행중">진행중</option>
+          <option value="보류">보류</option>
+          <option value="후속필요">후속필요</option>
+          <option value="지시">지시</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-btns" style="margin-top:14px;">
       <button class="btn-cancel" onclick="closeDiaryModal()">취소</button>
       <button id="diary-del-btn" class="btn-del" style="display:none" onclick="deleteDiary()">삭제</button>
       <button class="btn-save" onclick="saveDiary()">저장</button>
@@ -745,10 +813,9 @@ async function saveSbConfig(){
 async function loadFromSb(){
   if(!SB)return;showLoading(true);
   try{
-    const {data:ev,error:evErr}=await SB.from('cal_events').select('*').order('date');
+    // 일정(status='일정')은 work_diary에서 가져옴
     const {data:td,error:tdErr}=await SB.from('cal_todos').select('*').order('created_at',{ascending:false});
-    if(evErr||tdErr) console.warn('[SB] load error:',evErr,tdErr);
-    if(ev) events=ev.map(r=>({id:r.id,title:r.title,date:r.date,cat:r.cat,memo:r.memo||''}));
+    if(tdErr) console.warn('[SB] todos error:',tdErr);
     if(td) todos=td.map(r=>({id:r.id,text:r.text,cat:r.cat,pri:r.pri??1,status:r.status||(r.done?'done':'todo'),due:r.due||null,memo:r.memo||'',created_at:r.created_at||null}));
     saveLocal();
   }catch(e){console.warn('[SB] exception:',e);}
@@ -765,16 +832,21 @@ const CATS=[
 const KR=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
 const DAYS=['일','월','화','수','목','금','토'];
 const todayStr=(()=>{const d=new Date();return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`;})();
-let cur=new Date(),editId=null,currentTab='cal',events=[],todos=[];
-let dpDate=null; // 현재 열려있는 일자별 팝업의 날짜
-let openMonthKeys=new Set(); // 리스트뷰에서 펼쳐진 월 아코디언
+let cur=new Date(),editId=null,currentTab='cal',todos=[];
+let dpDate=null;
+let openMonthKeys=new Set();
+
+// 캘린더에 표시할 일정 = diaryRecords 중 status='일정'인 것
+function getCalEvents(){
+  return diaryRecords.filter(r=>r.status==='일정');
+}
 
 function p2(n){return String(n).padStart(2,'0');}
 function loadLocal(){
-  try{events=JSON.parse(localStorage.getItem('cal_events')||'[]');todos=JSON.parse(localStorage.getItem('cal_todos')||'[]');}
-  catch(e){events=[];todos=[];}
+  try{todos=JSON.parse(localStorage.getItem('cal_todos')||'[]');}
+  catch(e){todos=[];}
 }
-function saveLocal(){localStorage.setItem('cal_events',JSON.stringify(events));localStorage.setItem('cal_todos',JSON.stringify(todos));}
+function saveLocal(){localStorage.setItem('cal_todos',JSON.stringify(todos));}
 function showLoading(on){
   const b=document.getElementById('loading-bar');
   b.style.width=on?'70%':'100%';
@@ -812,8 +884,11 @@ function closeSettings(){
 
 /* ═══ 렌더링: 월간 캘린더 ═══ */
 function renderLegend(){
-  document.getElementById('cat-legend').innerHTML=
-    CATS.map(c=>`<div class="cat-item"><div class="cat-dot" style="background:${c.dot}"></div>${c.name}</div>`).join('');
+  const el=document.getElementById('cat-legend');
+  if(el) el.innerHTML=`
+    <div class="cat-item"><div class="cat-dot" style="background:#378ADD"></div>일정</div>
+    <div class="cat-item"><div class="cat-dot" style="background:#E2772E"></div>진행중</div>
+    <div class="cat-item"><div class="cat-dot" style="background:#E24B4A"></div>지시/후속</div>`;
 }
 
 function renderCal(){
@@ -834,16 +909,19 @@ function renderCal(){
     const holiday=isHoliday(dy,dm+1,dd);
     let dayDisplay='';
     if(!isThis) dayDisplay=`<span class="other-label">${dm+1}/${dd}</span>`;
-    const dayEvs=events.filter(e=>e.date===ds);
+    // work_diary 기반: 일정/진행중/지시/후속필요
+    const dayAll=diaryRecords.filter(r=>r.date===ds&&['일정','진행중','지시','후속필요'].includes(r.status));
     const dayTodos=getTodoForDate(ds);
-    const chips=dayEvs.slice(0,2).map(e=>
-      `<div class="event-chip" style="background:${CATS[e.cat].bg};border-left-color:${CATS[e.cat].bar}"
-        onclick="event.stopPropagation();openDayPopup('${ds}')">${e.title}</div>`).join('');
+    const chips=dayAll.slice(0,2).map(r=>{
+      const bg=r.status==='일정'?'#E3F0FF':r.status==='진행중'?'#FFF3E0':'#FFEBEE';
+      const bar=r.status==='일정'?'#378ADD':r.status==='진행중'?'#E2772E':'#E24B4A';
+      return `<div class="event-chip" style="background:${bg};border-left-color:${bar}"
+        onclick="event.stopPropagation();openDayPopup('${ds}')">${escapeHtml(r.title||r.partner||'')}</div>`;
+    }).join('');
     const todoChips=dayTodos.slice(0,1).map(t=>
       `<div class="event-chip" style="background:#FFF3E0;border-left-color:#E2772E;color:#111;"
         onclick="event.stopPropagation();">⏰ ${escapeHtml(t.text)}</div>`).join('');
-    const totalMore=(dayEvs.length>2?(dayEvs.length-2):0)+(dayTodos.length>1?(dayTodos.length-1):0);
-    const more=totalMore>0?`<div class="more-chip">+${totalMore}개</div>`:'';
+    const more=dayAll.length>2?`<div class="more-chip">+${dayAll.length-2}개</div>`:'';
     html+=`<div class="day-cell${!isThis?' other-month':''}" onclick="openDayPopup('${ds}')">
       <div class="day-top">
         <div class="lunar${holiday?' lunar-holiday':''}">${lbl}</div>
@@ -855,7 +933,7 @@ function renderCal(){
   document.getElementById('days').innerHTML=html;
 }
 
-/* ═══ 일자별 일정 팝업 ═══ */
+/* ═══ 일자별 일정 팝업 (work_diary 기반) ═══ */
 function openDayPopup(dateStr){
   dpDate=dateStr;
   const d=new Date(dateStr+'T00:00:00');
@@ -870,77 +948,72 @@ function closeDayPopup(){
   dpDate=null;
 }
 function renderDayPopupList(){
-  const list=events.filter(e=>e.date===dpDate);
+  // work_diary에서 해당 날짜 항목 (완료 제외 또는 전체)
+  const list=diaryRecords.filter(r=>r.date===dpDate);
   const el=document.getElementById('dp-list');
-  if(!list.length){el.innerHTML='<div class="dp-empty">이 날짜에 등록된 일정이 없어요</div>';return;}
-  el.innerHTML=list.map(e=>`
-    <div class="dp-item">
-      <div class="dp-cat-bar" style="background:${CATS[e.cat].dot}"></div>
+  if(!list.length){el.innerHTML='<div class="dp-empty">이 날짜에 등록된 일정이 없어요<br><small style="color:var(--text3)">아래 추가 버튼으로 일정을 등록하세요</small></div>';return;}
+  el.innerHTML=list.map(r=>{
+    const status=r.status||'완료';
+    const barColor=status==='일정'?'#378ADD':status==='진행중'?'#E2772E':status==='지시'||status==='후속필요'?'#E24B4A':'#639922';
+    return `<div class="dp-item">
+      <div class="dp-cat-bar" style="background:${barColor}"></div>
       <div class="dp-item-body">
-        <div class="dp-item-title">${escapeHtml(e.title)}</div>
-        <div class="dp-item-cat">${CATS[e.cat].name}</div>
-        ${e.memo?`<div class="dp-item-memo">${escapeHtml(e.memo)}</div>`:''}
+        <div class="dp-item-title">${escapeHtml(r.title||r.partner||'')}</div>
+        <div class="dp-item-cat">${r.category||''} · <span class="status-badge sb-${status}" style="font-size:10px;padding:1px 5px;">${status}</span></div>
+        ${r.content?`<div class="dp-item-memo">${escapeHtml(r.content.slice(0,80))}${r.content.length>80?'...':''}</div>`:''}
       </div>
       <div class="dp-item-actions">
-        <button class="dp-item-btn" onclick="editFromPopup('${e.id}')"><i class="ti ti-pencil"></i></button>
-        <button class="dp-item-btn del" onclick="deleteFromPopup('${e.id}')"><i class="ti ti-trash"></i></button>
+        <button class="dp-item-btn" onclick="editDiary('${r.id}');closeDayPopup();"><i class="ti ti-pencil"></i></button>
+        <button class="dp-item-btn del" onclick="deleteFromPopup('${r.id}')"><i class="ti ti-trash"></i></button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 function escapeHtml(s){
   const d=document.createElement('div');d.textContent=s;return d.innerHTML;
 }
 function openModalFromPopup(){
-  openModal(dpDate);
-}
-function editFromPopup(id){
-  openEditById(id);
+  // 팝업에서 추가 → 업무일지 모달 열기 (날짜 기본값 설정)
+  closeDayPopup();
+  openDiaryModal(dpDate);
 }
 async function deleteFromPopup(id){
-  events=events.filter(e=>String(e.id)!==String(id));
-  if(SB) await SB.from('cal_events').delete().eq('id',id);
-  saveLocal();renderDayPopupList();renderAll();
+  diaryRecords=diaryRecords.filter(r=>String(r.id)!==String(id));
+  if(SB){try{await SB.from('work_diary').delete().eq('id',id);}catch(e){console.warn(e);}}
+  renderDayPopupList();renderAll();
 }
 
-/* ═══ 리스트 뷰 (전체 일정, 날짜순 단일 테이블) ═══ */
+/* ═══ 리스트 뷰 (work_diary '일정' 기반) ═══ */
 function renderList(){
   document.getElementById('month-label').textContent=`전체 일정`;
-  if(!events.length){
+  // work_diary에서 '일정' 상태만 조회 (예정된 일정)
+  const schedules=diaryRecords.filter(r=>r.status==='일정').sort((a,b)=>a.date.localeCompare(b.date));
+  if(!schedules.length){
     document.getElementById('list-content').innerHTML='<div class="list-empty">등록된 일정이 없어요</div>';
     return;
   }
-  const sorted=[...events].sort((a,b)=>a.date.localeCompare(b.date));
-  const rows=sorted.map(e=>{
-    const d=new Date(e.date+'T00:00:00');
+  const rows=schedules.map(r=>{
+    const d=new Date(r.date+'T00:00:00');
     const lbl=lunarLabel(d.getFullYear(),d.getMonth()+1,d.getDate());
-    const cat=CATS[e.cat];
     return `<tr>
       <td class="lt-date">${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()} (${DAYS[d.getDay()]})<span class="lt-lunar">음력 ${lbl}</span></td>
-      <td class="lt-cat"><span class="lt-cat-badge" style="background:${cat.bg};color:#111;border-color:${cat.dot};">
-        <span class="cat-dot" style="background:${cat.dot}"></span>${cat.name}</span></td>
-      <td class="lt-title">${escapeHtml(e.title)}</td>
-      <td class="lt-memo">${e.memo?escapeHtml(e.memo):'<span style="color:var(--text3)">—</span>'}</td>
+      <td class="lt-cat"><span class="lt-cat-badge" style="background:#E3F0FF;color:#185FA5;border-color:#378ADD;">
+        <span class="cat-dot" style="background:#378ADD"></span>${r.category||'일정'}</span></td>
+      <td class="lt-title">${escapeHtml(r.title||r.partner||'')}</td>
+      <td class="lt-memo">${r.content?escapeHtml(r.content):'<span style="color:var(--text3)">—</span>'}</td>
       <td class="lt-actions">
-        <button class="lt-action-btn" onclick="event.stopPropagation();editFromList('${e.id}')"><i class="ti ti-pencil"></i></button>
-        <button class="lt-action-btn del" onclick="event.stopPropagation();deleteFromList('${e.id}')"><i class="ti ti-trash"></i></button>
+        <button class="lt-action-btn" onclick="event.stopPropagation();editDiary('${r.id}')"><i class="ti ti-pencil"></i></button>
+        <button class="lt-action-btn del" onclick="event.stopPropagation();deleteDiaryById('${r.id}');renderList();"><i class="ti ti-trash"></i></button>
       </td>
     </tr>`;
   }).join('');
   document.getElementById('list-content').innerHTML=`
     <div class="list-table-wrap">
       <table class="list-table">
-        <thead><tr><th>날짜</th><th>구분</th><th>일정 제목</th><th>메모</th><th>관리</th></tr></thead>
+        <thead><tr><th>날짜</th><th>유형</th><th>제목</th><th>내용</th><th>관리</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
     </div>`;
-}
-function editFromList(id){
-  openEditById(id);
-}
-async function deleteFromList(id){
-  events=events.filter(e=>String(e.id)!==String(id));
-  if(SB) await SB.from('cal_events').delete().eq('id',id);
-  saveLocal();renderList();
 }
 
 /* ═══ 할 일 ═══ */
@@ -1028,8 +1101,10 @@ function switchTab(tab){
   else renderAll();
 }
 function onAddBtnClick(){
+  // 모든 탭에서 업무일지 모달 사용 (일정 추가 포함)
   if(currentTab==='diary') openDiaryModal();
-  else openModal();
+  else if(currentTab==='cal'||currentTab==='list') openDiaryModal();
+  else openTodoModal();
 }
 function changeMonth(d){cur.setMonth(cur.getMonth()+d);renderAll();}
 function goToday(){cur=new Date();renderAll();}
@@ -1063,7 +1138,7 @@ function goToday(){cur=new Date();renderAll();}
       daysEl.style.transform=`translateX(${deltaX>0?60:-60}px)`;
       daysEl.style.opacity='0';
       setTimeout(()=>{
-        changeMonth(deltaX>0?-1:1);
+        changeMonth(deltaX>0?1:-1);
         daysEl.style.transition='none';
         daysEl.style.transform='translateX(0)';
         daysEl.style.opacity='1';
@@ -1257,6 +1332,8 @@ async function delTodo(id){
   loadLocal();renderLegend();renderCal();
   const ok=await initSb();
   if(ok){await loadFromSb();await loadDiary();renderAll();}
+  // 로컬 스토리지 cal_events 정리
+  localStorage.removeItem('cal_events');
 })();
 
 /* ═══════════════════════════════════════
@@ -1299,19 +1376,23 @@ function getDiaryFiltered(){
   const kw3=(document.getElementById('diary-kw3')?.value||'').trim().toLowerCase();
   const keywords=[kw1,kw2,kw3].filter(k=>k.length>0);
   const catF=document.getElementById('diary-cat-filter')?.value||'';
-  const actF=document.getElementById('diary-action-filter')?.value||'';
-  const hideLog=document.getElementById('diary-hide-worklog')?.checked??true;
+  const statusF=document.getElementById('diary-status-filter')?.value||'';
+  const deptF=document.getElementById('diary-dept-filter')?.value||'';
   return diaryRecords.filter(r=>{
-    if(hideLog && r.is_work_log) return false;
     if(catF && r.category!==catF) return false;
-    if(actF && r.action_type!==actF) return false;
+    if(statusF && r.status!==statusF) return false;
+    if(deptF && r.target_dept!==deptF) return false;
     if(keywords.length>0){
-      const hay=(r.partner+' '+r.title+' '+r.content+' '+r.dept_contact+' '+r.origin).toLowerCase();
-      // AND 검색: 모든 키워드가 포함되어야 함
+      const hay=(r.partner+' '+r.title+' '+r.content+' '+r.dept_contact+' '+r.origin+' '+(r.target_dept||'')).toLowerCase();
       if(!keywords.every(kw=>hay.includes(kw))) return false;
     }
     return true;
   });
+}
+function searchDiary(){diaryPage=1;renderDiary();}
+function debouncedSearch(){
+  clearTimeout(diarySearchTimer);
+  diarySearchTimer=setTimeout(()=>{diaryPage=1;renderDiary();},400);
 }
 
 /* ─── 다운로드 (CSV) ─── */
@@ -1401,21 +1482,24 @@ function renderDiary(){
   } else {
     tbody.innerHTML=slice.map(r=>{
       const d=new Date(r.date+'T00:00:00');
-      const dayStr=`${d.getMonth()+1}/${d.getDate()} (${DAYS_KR[d.getDay()]})`;
-      const cc=CAT_COLORS[r.category]||CAT_COLORS['기타'];
+      const dayStr=`${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()} (${DAYS_KR[d.getDay()]})`;
       const impCls=r.importance==='상'?'imp-high':r.importance==='하'?'imp-low':'imp-mid';
-      const isLog=r.is_work_log?'worklog':'';
-      return `<tr class="${isLog}">
-        <td class="dt-date">${dayStr}<div class="dt-day">${r.date.slice(0,4)}</div></td>
-        <td class="dt-cat"><span class="dt-cat-badge" style="background:${cc.bg};color:${cc.color};">${r.category}</span></td>
+      const status=r.status||'완료';
+      const rowCls=r.is_work_log?'worklog':(status!=='완료'?`status-${status}`:'');
+      const sbCls=`sb-${status}`;
+      return `<tr class="${rowCls}">
+        <td class="dt-date">${dayStr}</td>
+        <td class="dt-cat">${r.category||''}</td>
         <td class="dt-action">${r.action_type||''}</td>
-        <td class="dt-partner" title="${escapeHtml(r.partner||'')}">${escapeHtml(r.partner||'—')}</td>
+        <td class="dt-partner">${escapeHtml(r.partner||'—')}</td>
+        <td class="dt-dept-cell">${escapeHtml(r.target_dept||'')}</td>
         <td>
           <div class="dt-title">${escapeHtml(r.title||'')}</div>
           <div class="dt-content">${escapeHtml(r.content||'')}</div>
-          ${r.follow_up?`<div style="font-size:10px;color:#E2772E;margin-top:2px;">→ ${escapeHtml(r.follow_up)}</div>`:''}
+          ${r.follow_up?`<div class="dt-followup">→ ${escapeHtml(r.follow_up)}</div>`:''}
         </td>
         <td class="dt-imp"><span class="imp-badge ${impCls}">${r.importance||'중'}</span></td>
+        <td class="dt-status"><span class="status-badge ${sbCls}">${status}</span></td>
         <td class="dt-actions">
           <button class="dt-btn" onclick="editDiary('${r.id}')"><i class="ti ti-pencil"></i></button>
           <button class="dt-btn del" onclick="deleteDiaryById('${r.id}')"><i class="ti ti-trash"></i></button>
@@ -1458,6 +1542,7 @@ function openDiaryModal(date){
   document.getElementById('dm-action').value='방문/정기방문';
   document.getElementById('dm-partner').value='';
   document.getElementById('dm-dept').value='';
+  document.getElementById('dm-target-dept').value='';
   document.getElementById('dm-title').value='';
   document.getElementById('dm-content').value='';
   document.getElementById('dm-followup').value='';
@@ -1477,6 +1562,7 @@ function editDiary(id){
   document.getElementById('dm-action').value=r.action_type||'기타';
   document.getElementById('dm-partner').value=r.partner||'';
   document.getElementById('dm-dept').value=r.dept_contact||'';
+  document.getElementById('dm-target-dept').value=r.target_dept||'';
   document.getElementById('dm-title').value=r.title||'';
   document.getElementById('dm-content').value=r.content||'';
   document.getElementById('dm-followup').value=r.follow_up||'';
@@ -1497,6 +1583,7 @@ async function saveDiary(){
     action_type: document.getElementById('dm-action').value,
     partner: document.getElementById('dm-partner').value.trim(),
     dept_contact: document.getElementById('dm-dept').value.trim(),
+    target_dept: document.getElementById('dm-target-dept').value,
     title: document.getElementById('dm-title').value.trim(),
     content: document.getElementById('dm-content').value.trim(),
     follow_up: document.getElementById('dm-followup').value.trim(),
