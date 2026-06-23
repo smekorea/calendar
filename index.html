@@ -6,13 +6,13 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ParkJungYong 캘린더</title>
+<title>PJY 업무관리</title>
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#378ADD">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="PJY 캘린더">
+<meta name="apple-mobile-web-app-title" content="PJY 업무관리">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <style>
@@ -345,6 +345,24 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
 .page-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
 .page-btn:hover:not(.active){background:var(--surface);}
 .diary-empty{text-align:center;color:var(--text3);padding:40px 0;font-size:var(--fs-base);}
+
+/* 키워드 검색 */
+.diary-keywords{display:flex;gap:4px;flex:1;min-width:200px;}
+.diary-kw{flex:1;min-width:60px;border:1px solid var(--border);border-radius:8px;
+  padding:7px 8px;font-size:var(--fs-sm);background:var(--app-bg);color:var(--text1);font-family:inherit;}
+.diary-kw:focus{outline:none;border-color:var(--accent);}
+
+/* 다운로드 버튼 */
+.diary-dl-btn{background:none;border:1px solid var(--border);border-radius:8px;
+  padding:0 12px;height:34px;font-size:var(--fs-sm);cursor:pointer;color:var(--text1);
+  font-family:inherit;display:flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;}
+.diary-dl-btn:hover{background:var(--surface);}
+
+/* 컬럼 리사이즈 */
+.diary-table th.resizable{position:relative;user-select:none;}
+.col-resizer{position:absolute;right:0;top:0;width:6px;height:100%;cursor:col-resize;
+  background:transparent;z-index:1;}
+.col-resizer:hover,.col-resizer.dragging{background:rgba(255,255,255,.3);}
 </style>
 </head>
 <body>
@@ -356,7 +374,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
     <div class="nav-month">
       <button class="icon-btn" onclick="changeMonth(-1)"><i class="ti ti-chevron-left"></i></button>
       <div class="nav-title">
-        <div class="nav-sub">ParkJungYong Calendar</div>
+        <div class="nav-sub">PJY 업무관리</div>
         <h2 id="month-label"></h2>
       </div>
       <button class="icon-btn" onclick="changeMonth(1)"><i class="ti ti-chevron-right"></i></button>
@@ -365,7 +383,6 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
     <div class="tabs">
       <button class="tab active" id="tab-cal" onclick="switchTab('cal')">월간</button>
       <button class="tab" id="tab-list" onclick="switchTab('list')">리스트</button>
-      <button class="tab" id="tab-todo" onclick="switchTab('todo')">할 일</button>
       <button class="tab" id="tab-diary" onclick="switchTab('diary')">업무일지</button>
     </div>
     <div class="right-btns">
@@ -451,7 +468,11 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
     <div class="diary-panel">
       <!-- 검색/필터 바 -->
       <div class="diary-filter-bar">
-        <input class="diary-search" id="diary-search" placeholder="🔍 거래처, 내용 검색..." oninput="debouncedSearch()">
+        <div class="diary-keywords">
+          <input class="diary-kw" id="diary-kw1" placeholder="키워드1" oninput="debouncedSearch()">
+          <input class="diary-kw" id="diary-kw2" placeholder="키워드2" oninput="debouncedSearch()">
+          <input class="diary-kw" id="diary-kw3" placeholder="키워드3" oninput="debouncedSearch()">
+        </div>
         <select class="diary-sel" id="diary-cat-filter" onchange="renderDiary()">
           <option value="">전체 유형</option>
           <option value="영업/거래처관리">영업/거래처관리</option>
@@ -479,15 +500,30 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
           <input type="checkbox" id="diary-hide-worklog" checked onchange="renderDiary()">
           <span>근태제외</span>
         </label>
+        <button class="diary-dl-btn" onclick="downloadDiary()" title="엑셀 다운로드">
+          <i class="ti ti-download"></i> 다운로드
+        </button>
       </div>
       <div class="diary-stats" id="diary-stats"></div>
-      <div class="diary-table-wrap">
+      <div class="diary-table-wrap" id="diary-table-wrap">
         <table class="diary-table" id="diary-table">
           <thead>
             <tr>
-              <th style="width:90px">날짜</th>
-              <th style="width:100px">업무유형</th>
-              <th style="width:90px">활동</th>
+              <th class="resizable" style="width:90px" data-col="0">날짜</th>
+              <th class="resizable" style="width:110px" data-col="1">업무유형</th>
+              <th class="resizable" style="width:90px" data-col="2">활동</th>
+              <th class="resizable" style="width:110px" data-col="3">거래처</th>
+              <th class="resizable" style="width:auto" data-col="4">제목/내용</th>
+              <th class="resizable" style="width:60px" data-col="5">중요도</th>
+              <th style="width:70px">관리</th>
+            </tr>
+          </thead>
+          <tbody id="diary-tbody"></tbody>
+        </table>
+      </div>
+      <div class="diary-pagination" id="diary-pagination"></div>
+    </div>
+  </div>
               <th style="width:110px">거래처</th>
               <th>제목/내용</th>
               <th style="width:60px">중요도</th>
@@ -799,17 +835,22 @@ function renderCal(){
     let dayDisplay='';
     if(!isThis) dayDisplay=`<span class="other-label">${dm+1}/${dd}</span>`;
     const dayEvs=events.filter(e=>e.date===ds);
+    const dayTodos=getTodoForDate(ds);
     const chips=dayEvs.slice(0,2).map(e=>
       `<div class="event-chip" style="background:${CATS[e.cat].bg};border-left-color:${CATS[e.cat].bar}"
         onclick="event.stopPropagation();openDayPopup('${ds}')">${e.title}</div>`).join('');
-    const more=dayEvs.length>2?`<div class="more-chip">+${dayEvs.length-2}개</div>`:'';
+    const todoChips=dayTodos.slice(0,1).map(t=>
+      `<div class="event-chip" style="background:#FFF3E0;border-left-color:#E2772E;color:#111;"
+        onclick="event.stopPropagation();">⏰ ${escapeHtml(t.text)}</div>`).join('');
+    const totalMore=(dayEvs.length>2?(dayEvs.length-2):0)+(dayTodos.length>1?(dayTodos.length-1):0);
+    const more=totalMore>0?`<div class="more-chip">+${totalMore}개</div>`:'';
     html+=`<div class="day-cell${!isThis?' other-month':''}" onclick="openDayPopup('${ds}')">
       <div class="day-top">
         <div class="lunar${holiday?' lunar-holiday':''}">${lbl}</div>
         ${isThis
           ? `<div class="day-num${isSun?' sun-num':''}${isSat?' sat-num':''}${isT?' today-num':''}">${dd}</div>`
           : dayDisplay}
-      </div>${chips}${more}</div>`;
+      </div>${chips}${todoChips}${more}</div>`;
   }
   document.getElementById('days').innerHTML=html;
 }
@@ -978,15 +1019,16 @@ function renderAll(){
 function switchTab(tab){
   currentTab=tab;
   ['cal','list','todo','diary'].forEach(t=>{
-    document.getElementById(t+'-view').style.display=t===tab?'':'none';
-    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+    const el=document.getElementById(t+'-view');
+    if(el) el.style.display=t===tab?'':'none';
+    const btn=document.getElementById('tab-'+t);
+    if(btn) btn.classList.toggle('active',t===tab);
   });
   if(tab==='diary') renderDiary();
   else renderAll();
 }
 function onAddBtnClick(){
-  if(currentTab==='todo') openTodoModal();
-  else if(currentTab==='diary') openDiaryModal();
+  if(currentTab==='diary') openDiaryModal();
   else openModal();
 }
 function changeMonth(d){cur.setMonth(cur.getMonth()+d);renderAll();}
@@ -1252,7 +1294,10 @@ async function loadDiary(){
 }
 
 function getDiaryFiltered(){
-  const search=document.getElementById('diary-search')?.value.trim().toLowerCase()||'';
+  const kw1=(document.getElementById('diary-kw1')?.value||'').trim().toLowerCase();
+  const kw2=(document.getElementById('diary-kw2')?.value||'').trim().toLowerCase();
+  const kw3=(document.getElementById('diary-kw3')?.value||'').trim().toLowerCase();
+  const keywords=[kw1,kw2,kw3].filter(k=>k.length>0);
   const catF=document.getElementById('diary-cat-filter')?.value||'';
   const actF=document.getElementById('diary-action-filter')?.value||'';
   const hideLog=document.getElementById('diary-hide-worklog')?.checked??true;
@@ -1260,12 +1305,75 @@ function getDiaryFiltered(){
     if(hideLog && r.is_work_log) return false;
     if(catF && r.category!==catF) return false;
     if(actF && r.action_type!==actF) return false;
-    if(search){
-      const hay=(r.partner+r.title+r.content+r.dept_contact+r.origin).toLowerCase();
-      if(!hay.includes(search)) return false;
+    if(keywords.length>0){
+      const hay=(r.partner+' '+r.title+' '+r.content+' '+r.dept_contact+' '+r.origin).toLowerCase();
+      // AND 검색: 모든 키워드가 포함되어야 함
+      if(!keywords.every(kw=>hay.includes(kw))) return false;
     }
     return true;
   });
+}
+
+/* ─── 다운로드 (CSV) ─── */
+function downloadDiary(){
+  const filtered=getDiaryFiltered();
+  if(!filtered.length){alert('다운로드할 데이터가 없어요.');return;}
+  const cols=['날짜','업무유형','활동','거래처','담당부서','제목','내용','중요도','상태','후속조치','원본분류'];
+  const rows=filtered.map(r=>[
+    r.date, r.category, r.action_type, r.partner, r.dept_contact,
+    r.title, r.content, r.importance, r.status, r.follow_up, r.origin
+  ].map(v=>'"'+(String(v||'').replace(/"/g,'""'))+'"').join(','));
+  const csv='\uFEFF'+cols.join(',')+'\n'+rows.join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`PJY업무일지_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+
+/* ─── 컬럼 리사이즈 ─── */
+function initDiaryResizable(){
+  const ths=document.querySelectorAll('.diary-table th.resizable');
+  ths.forEach(th=>{
+    // 이미 리사이저가 있으면 건너뜀
+    if(th.querySelector('.col-resizer')) return;
+    const resizer=document.createElement('div');
+    resizer.className='col-resizer';
+    th.appendChild(resizer);
+    let startX=0,startW=0;
+    const onMouseMove=e=>{
+      const w=Math.max(40,startW+(e.clientX-startX));
+      th.style.width=w+'px';
+    };
+    const onMouseUp=()=>{
+      resizer.classList.remove('dragging');
+      window.removeEventListener('mousemove',onMouseMove);
+      window.removeEventListener('mouseup',onMouseUp);
+    };
+    resizer.addEventListener('mousedown',e=>{
+      e.preventDefault();
+      startX=e.clientX;startW=th.offsetWidth;
+      resizer.classList.add('dragging');
+      window.addEventListener('mousemove',onMouseMove);
+      window.addEventListener('mouseup',onMouseUp);
+    });
+    // 터치 지원
+    resizer.addEventListener('touchstart',e=>{
+      startX=e.touches[0].clientX;startW=th.offsetWidth;
+    },{passive:true});
+    resizer.addEventListener('touchmove',e=>{
+      const w=Math.max(40,startW+(e.touches[0].clientX-startX));
+      th.style.width=w+'px';
+    },{passive:true});
+  });
+}
+
+/* ─── 할 일 캘린더 표기 ─── */
+function getTodoForDate(dateStr){
+  // 마감일이 해당 날짜인 미완료 할 일
+  return todos.filter(t=>t.due===dateStr && t.status!=='done');
 }
 
 function renderDiary(){
@@ -1331,6 +1439,8 @@ function renderDiary(){
   } else if(pagEl){
     pagEl.innerHTML='';
   }
+  // 컬럼 리사이즈 핸들 초기화
+  setTimeout(initDiaryResizable, 50);
 }
 
 function diaryGoPage(p){diaryPage=p;renderDiary();}
