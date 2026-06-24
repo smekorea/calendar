@@ -863,7 +863,8 @@ let openMonthKeys=new Set();
 
 // 캘린더에 표시할 일정 = diaryRecords 중 status='일정'인 것
 function getCalEvents(){
-  return diaryRecords.filter(r=>r.status==='일정');
+  // 오늘(KST) 이후 날짜인 것만 달력에 표시
+  return diaryRecords.filter(r=>(r.date||'').slice(0,10)>=todayStr);
 }
 
 function p2(n){return String(n).padStart(2,'0');}
@@ -935,11 +936,12 @@ function renderCal(){
     let dayDisplay='';
     if(!isThis) dayDisplay=`<span class="other-label">${dm+1}/${dd}</span>`;
     // work_diary 기반: 일정/진행중/지시/후속필요 (날짜 앞 10자리 비교)
-    const dayAll=diaryRecords.filter(r=>(r.date||'').slice(0,10)===ds&&['일정','진행중','지시','후속필요'].includes(r.status));
+    const dayAll=diaryRecords.filter(r=>(r.date||'').slice(0,10)===ds&&(r.date||'').slice(0,10)>=todayStr);
     const dayTodos=getTodoForDate(ds);
     const chips=dayAll.slice(0,2).map(r=>{
-      const bg=r.status==='일정'?'#E3F0FF':r.status==='진행중'?'#FFF3E0':'#FFEBEE';
-      const bar=r.status==='일정'?'#378ADD':r.status==='진행중'?'#E2772E':'#E24B4A';
+      const isFuture=(r.date||'').slice(0,10)>=todayStr;
+      const bg=isFuture?'#E3F0FF':r.status==='진행중'?'#FFF3E0':'#FFEBEE';
+      const bar=isFuture?'#378ADD':r.status==='진행중'?'#E2772E':'#E24B4A';
       return `<div class="event-chip" style="background:${bg};border-left-color:${bar}"
         onclick="event.stopPropagation();openDayPopup('${ds}')">${escapeHtml(r.title||r.partner||'')}</div>`;
     }).join('');
@@ -979,14 +981,15 @@ function renderDayPopupList(){
   if(!list.length){el.innerHTML='<div class="dp-empty">이 날짜에 등록된 일정이 없어요<br><small style="color:var(--text3)">아래 추가 버튼으로 일정을 등록하세요</small></div>';return;}
   el.innerHTML=list.map(r=>{
     const status=r.status||'완료';
-    const barColor=status==='일정'?'#378ADD':status==='진행중'?'#E2772E':status==='지시'||status==='후속필요'?'#E24B4A':'#639922';
-    // 일정 상태인 경우 "업무일지로 전환" 버튼 표시
-    const convertBtn=status==='일정'
+    const barColor=isSchedule?'#378ADD':status==='진행중'?'#E2772E':status==='지시'||status==='후속필요'?'#E24B4A':'#639922';
+    // 오늘 이후 날짜면 일정 → 업무일지 전환 버튼 표시
+    const isSchedule=(r.date||'').slice(0,10)>=todayStr;
+    const convertBtn=isSchedule
       ? `<button class="dp-item-btn convert" onclick="convertToWorkDiary('${r.id}')" title="업무일지로 전환">
            <i class="ti ti-transfer"></i>
          </button>`
       : '';
-    return `<div class="dp-item${status==='일정'?' dp-item-schedule':''}">
+    return `<div class="dp-item${isSchedule?' dp-item-schedule':''}">
       <div class="dp-cat-bar" style="background:${barColor}"></div>
       <div class="dp-item-body">
         <div class="dp-item-title">${escapeHtml(r.title||r.partner||'')}</div>
@@ -1041,8 +1044,9 @@ async function deleteFromPopup(id){
 /* ═══ 일정 탭 (work_diary status=일정) ═══ */
 function renderList(){
   // 오늘 이후 미래 일정만 표시 (status='일정'), 날짜 앞 10자리만 비교
+  // 날짜 기준: 오늘(KST) 포함 이후인 것 전체 (status 무관)
   const schedules=diaryRecords
-    .filter(r=>r.status==='일정' && (r.date||'').slice(0,10)>=todayStr)
+    .filter(r=>(r.date||'').slice(0,10)>=todayStr)
     .sort((a,b)=>(a.date||'').localeCompare(b.date||''));
   if(!schedules.length){
     document.getElementById('list-content').innerHTML='<div class="list-empty">예정된 일정이 없어요<br><small style="color:var(--text3)">+ 입력 버튼으로 일정을 등록하세요</small></div>';
@@ -1060,7 +1064,7 @@ function renderList(){
       <td class="dt-partner">${escapeHtml(r.partner||'—')}</td>
       <td class="dt-title-cell">${escapeHtml(r.title||'')}</td>
       <td><div class="dt-content">${escapeHtml(r.content||'')}</div></td>
-      <td class="dt-status"><span class="status-badge sb-일정">일정</span></td>
+      <td class="dt-status"><span class="status-badge sb-일정">${r.status||'일정'}</span></td>
       <td class="dt-actions">
         <button class="dt-btn" style="color:#185FA5;border-color:#378ADD;" onclick="event.stopPropagation();convertToWorkDiary('${r.id}')" title="업무일지로 전환"><i class="ti ti-transfer"></i></button>
         <button class="dt-btn" onclick="event.stopPropagation();editDiary('${r.id}')"><i class="ti ti-pencil"></i></button>
@@ -1466,7 +1470,8 @@ function getDiaryFiltered(){
   const deptF=document.getElementById('diary-dept-filter')?.value||'';
   // 상태 필터가 없을 때 기본적으로 '일정' 상태 숨김
   return diaryRecords.filter(r=>{
-    if(!statusF && r.status==='일정') return false;
+    // 날짜 기준: 오늘 이전인 것만 업무일지 (status 무관)
+    if(!statusF && (r.date||'').slice(0,10)>=todayStr) return false;
     if(catF && r.category!==catF) return false;
     if(statusF && r.status!==statusF) return false;
     if(deptF && (r.target_dept||'')!==deptF) return false;
