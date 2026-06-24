@@ -934,8 +934,8 @@ function renderCal(){
     const holiday=isHoliday(dy,dm+1,dd);
     let dayDisplay='';
     if(!isThis) dayDisplay=`<span class="other-label">${dm+1}/${dd}</span>`;
-    // work_diary 기반: 일정/진행중/지시/후속필요
-    const dayAll=diaryRecords.filter(r=>r.date===ds&&['일정','진행중','지시','후속필요'].includes(r.status));
+    // work_diary 기반: 일정/진행중/지시/후속필요 (날짜 앞 10자리 비교)
+    const dayAll=diaryRecords.filter(r=>(r.date||'').slice(0,10)===ds&&['일정','진행중','지시','후속필요'].includes(r.status));
     const dayTodos=getTodoForDate(ds);
     const chips=dayAll.slice(0,2).map(r=>{
       const bg=r.status==='일정'?'#E3F0FF':r.status==='진행중'?'#FFF3E0':'#FFEBEE';
@@ -1040,10 +1040,10 @@ async function deleteFromPopup(id){
 
 /* ═══ 일정 탭 (work_diary status=일정) ═══ */
 function renderList(){
-  // 오늘 이후 미래 일정만 표시 (status='일정')
+  // 오늘 이후 미래 일정만 표시 (status='일정'), 날짜 앞 10자리만 비교
   const schedules=diaryRecords
-    .filter(r=>r.status==='일정' && r.date>=todayStr)
-    .sort((a,b)=>a.date.localeCompare(b.date));
+    .filter(r=>r.status==='일정' && (r.date||'').slice(0,10)>=todayStr)
+    .sort((a,b)=>(a.date||'').localeCompare(b.date||''));
   if(!schedules.length){
     document.getElementById('list-content').innerHTML='<div class="list-empty">예정된 일정이 없어요<br><small style="color:var(--text3)">+ 입력 버튼으로 일정을 등록하세요</small></div>';
     return;
@@ -1469,9 +1469,9 @@ function getDiaryFiltered(){
     if(!statusF && r.status==='일정') return false;
     if(catF && r.category!==catF) return false;
     if(statusF && r.status!==statusF) return false;
-    if(deptF && r.target_dept!==deptF) return false;
+    if(deptF && (r.target_dept||'')!==deptF) return false;
     if(keywords.length>0){
-      const hay=(r.partner+' '+r.title+' '+r.content+' '+r.dept_contact+' '+r.origin+' '+(r.target_dept||'')).toLowerCase();
+      const hay=((r.partner||'')+' '+(r.title||'')+' '+(r.content||'')+' '+(r.dept_contact||'')+' '+(r.origin||'')+' '+(r.target_dept||'')).toLowerCase();
       if(!keywords.every(kw=>hay.includes(kw))) return false;
     }
     return true;
