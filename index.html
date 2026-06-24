@@ -305,10 +305,11 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
   cursor:pointer;flex-shrink:0;white-space:nowrap;}
 .diary-stats{font-size:11px;color:var(--text2);margin-bottom:6px;display:flex;gap:12px;flex-wrap:wrap;}
 .diary-stat-item{display:flex;align-items:center;gap:4px;}
-.diary-table-wrap{flex:1;overflow:auto;border:1.5px solid var(--border);border-radius:10px;}
+.diary-table-wrap{flex:1;overflow:auto;border:1.5px solid var(--border);border-radius:10px;position:relative;}
 .diary-table{width:100%;border-collapse:collapse;min-width:700px;font-size:13px;}
 .diary-table th{background:#2c3e50;color:#fff;font-size:12px;font-weight:700;
-  padding:9px 10px;text-align:left;border-right:1px solid rgba(255,255,255,.12);white-space:nowrap;}
+  padding:9px 10px;text-align:center;border-right:1px solid rgba(255,255,255,.12);white-space:nowrap;
+  position:sticky;top:0;z-index:10;}
 .diary-table th:last-child{border-right:none;}
 .diary-table td{padding:8px 10px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);
   vertical-align:top;color:var(--text1);font-size:13px;}
@@ -938,17 +939,17 @@ function renderCal(){
     // work_diary 기반: 일정/진행중/지시/후속필요 (날짜 앞 10자리 비교)
     const dayAll=diaryRecords.filter(r=>(r.date||'').slice(0,10)===ds&&(r.date||'').slice(0,10)>=todayStr);
     const dayTodos=getTodoForDate(ds);
-    const chips=dayAll.slice(0,2).map(r=>{
+    const chips=dayAll.map(r=>{
       const isFuture=(r.date||'').slice(0,10)>=todayStr;
       const bg=isFuture?'#E3F0FF':r.status==='진행중'?'#FFF3E0':'#FFEBEE';
       const bar=isFuture?'#378ADD':r.status==='진행중'?'#E2772E':'#E24B4A';
       return `<div class="event-chip" style="background:${bg};border-left-color:${bar}"
         onclick="event.stopPropagation();openDayPopup('${ds}')">${escapeHtml(r.title||r.partner||'')}</div>`;
     }).join('');
-    const todoChips=dayTodos.slice(0,1).map(t=>
+    const todoChips=dayTodos.map(t=>
       `<div class="event-chip" style="background:#FFF3E0;border-left-color:#E2772E;color:#111;"
         onclick="event.stopPropagation();">⏰ ${escapeHtml(t.text)}</div>`).join('');
-    const more=dayAll.length>2?`<div class="more-chip">+${dayAll.length-2}개</div>`:'';
+    const more='';
     html+=`<div class="day-cell${!isThis?' other-month':''}" onclick="openDayPopup('${ds}')">
       <div class="day-top">
         <div class="lunar${holiday?' lunar-holiday':''}">${lbl}</div>
@@ -1058,7 +1059,7 @@ function renderList(){
     const isToday=r.date===todayStr;
     const rowStyle=isToday?'background:#FFF8E1;':'';
     return `<tr style="${rowStyle}">
-      <td class="dt-date${d.getDay()===0?' dt-date-sun':d.getDay()===6?' dt-date-sat':''}">${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()} (${DAYS[d.getDay()]})<br><span style="font-size:10px;color:var(--text3);">음력 ${lbl}</span>${isToday?'<br><span style="color:#E2772E;font-size:10px;font-weight:700;">▶ 오늘</span>':''}</td>
+      <td class="dt-date${d.getDay()===0?' dt-date-sun':d.getDay()===6?' dt-date-sat':''}">${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()} (${DAYS[d.getDay()]})${isToday?' <span style="color:#E2772E;font-size:10px;font-weight:700;">▶ 오늘</span>':''}</td>
       <td class="dt-cat">${r.category||'일정'}</td>
       <td class="dt-action">${r.action_type||''}</td>
       <td class="dt-partner">${escapeHtml(r.partner||'—')}</td>
@@ -1074,20 +1075,21 @@ function renderList(){
   }).join('');
   document.getElementById('list-content').innerHTML=`
     <div class="diary-table-wrap">
-      <table class="diary-table">
+      <table class="diary-table" id="list-table">
         <thead><tr>
-          <th style="width:90px">날짜</th>
-          <th style="width:100px">업무유형</th>
-          <th style="width:85px">활동</th>
-          <th style="width:90px">거래처</th>
-          <th style="width:140px">제목</th>
-          <th>내용</th>
-          <th style="width:65px">상태</th>
+          <th class="resizable" style="width:100px">날짜</th>
+          <th class="resizable" style="width:100px">업무유형</th>
+          <th class="resizable" style="width:85px">활동</th>
+          <th class="resizable" style="width:90px">거래처</th>
+          <th class="resizable" style="width:140px">제목</th>
+          <th class="resizable">내용</th>
+          <th class="resizable" style="width:65px">상태</th>
           <th style="width:80px">관리</th>
         </tr></thead>
         <tbody>${rows}</tbody>
       </table>
     </div>`;
+  setTimeout(initDiaryResizable, 50);
 }
 
 /* ═══ 할 일 ═══ */
