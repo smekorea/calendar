@@ -165,12 +165,12 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
 .list-table td:last-child{border-right:none;}
 .list-table tr:last-child td{border-bottom:none;}
 .list-table tr:hover td{background:#f7faff;}
-.lt-date{white-space:nowrap;font-weight:700;color:var(--text1);}
+.lt-date{white-space:nowrap;font-weight:400;color:var(--text1);}
 .lt-date .lt-lunar{font-size:10px;color:var(--text3);font-weight:400;display:block;}
 .lt-cat{white-space:nowrap;}
 .lt-cat-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;
   padding:3px 10px;border-radius:12px;font-weight:700;border:1.5px solid transparent;}
-.lt-title{font-weight:700;color:#111;max-width:200px;}
+.lt-title{font-weight:400;color:#111;max-width:200px;}
 .lt-memo{color:var(--text2);max-width:240px;}
 .lt-actions{white-space:nowrap;}
 .lt-action-btn{background:none;border:1px solid var(--border);border-radius:6px;
@@ -320,15 +320,18 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','N
 .diary-table tr.status-지시 td{background:#fff0f0;}
 .diary-table tr.status-보류 td{background:#f8f8f8;}
 .diary-table tr.worklog td{background:#fafafa;color:var(--text3);}
-.dt-date{white-space:nowrap;font-weight:700;font-size:13px;}
-.dt-cat{font-size:13px;font-weight:600;color:var(--text1);white-space:nowrap;}
+.dt-date{white-space:nowrap;font-weight:400;font-size:13px;}
+.dt-cat{font-size:13px;font-weight:400;color:var(--text1);white-space:nowrap;}
 .dt-action{font-size:13px;color:var(--text2);white-space:nowrap;}
-.dt-partner{font-weight:600;font-size:13px;color:var(--text1);}
+.dt-partner{font-weight:400;font-size:13px;color:var(--text1);}
 .dt-dept-cell{font-size:13px;color:var(--text2);}
-.dt-title{font-weight:700;font-size:13px;color:#111;margin-bottom:3px;}
+.dt-title{font-weight:400;font-size:13px;color:#111;margin-bottom:3px;}
 .dt-content{font-size:12px;color:var(--text2);
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.dt-followup{font-size:11px;color:#E2772E;margin-top:3px;font-weight:600;}
+.dt-followup{font-size:11px;color:#E2772E;margin-top:3px;font-weight:400;}
+.dt-title-cell{font-weight:400;font-size:13px;color:#111;white-space:nowrap;max-width:140px;overflow:hidden;text-overflow:ellipsis;}
+.dt-date-sun{color:#E24B4A !important;}
+.dt-date-sat{color:#378ADD !important;}
 .dt-imp{text-align:center;}
 .imp-badge{font-size:12px;padding:2px 6px;border-radius:6px;font-weight:700;}
 .imp-high{background:#FFE3E3;color:#C42B2B;}
@@ -1051,7 +1054,7 @@ function renderList(){
     const isToday=r.date===todayStr;
     const rowStyle=isToday?'background:#FFF8E1;':'';
     return `<tr style="${rowStyle}">
-      <td class="dt-date">${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()} (${DAYS[d.getDay()]})<br><span style="font-size:10px;color:var(--text3);">음력 ${lbl}</span>${isToday?'<br><span style="color:#E2772E;font-size:10px;font-weight:700;">▶ 오늘</span>':''}</td>
+      <td class="dt-date${d.getDay()===0?' dt-date-sun':d.getDay()===6?' dt-date-sat':''}">${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()} (${DAYS[d.getDay()]})<br><span style="font-size:10px;color:var(--text3);">음력 ${lbl}</span>${isToday?'<br><span style="color:#E2772E;font-size:10px;font-weight:700;">▶ 오늘</span>':''}</td>
       <td class="dt-cat">${r.category||'일정'}</td>
       <td class="dt-action">${r.action_type||''}</td>
       <td class="dt-partner">${escapeHtml(r.partner||'—')}</td>
@@ -1573,7 +1576,7 @@ function renderDiary(){
       const rowCls=r.is_work_log?'worklog':(status!=='완료'?`status-${status}`:'');
       const sbCls=`sb-${status}`;
       return `<tr class="${rowCls}">
-        <td class="dt-date">${dayStr}</td>
+        <td class="dt-date${d.getDay()===0?' dt-date-sun':d.getDay()===6?' dt-date-sat':''}">${dayStr}</td>
         <td class="dt-cat">${r.category||''}</td>
         <td class="dt-action">${r.action_type||''}</td>
         <td class="dt-partner">${escapeHtml(r.partner||'—')}</td>
