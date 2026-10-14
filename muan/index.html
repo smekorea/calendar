@@ -153,17 +153,17 @@ th{color:var(--muted);font-size:12px}
       <fieldset>
         <legend><span class="n">2</span>가능한 일정<span class="hint" id="dates-hint">가능한 날 모두 선택</span></legend>
         <div class="opts wide" id="f-dates"></div>
-        <input class="etc" id="dates-etc" type="text" maxlength="100" placeholder="11/10(화) ~ 11/13(금)이면 가능" hidden>
+        <input class="etc" id="dates-etc-text" type="text" maxlength="100" placeholder="11/10(화) ~ 11/13(금)이면 가능" hidden>
       </fieldset>
       <fieldset>
         <legend><span class="n">3</span>계비 지원 금액<span class="hint">7명 전체 총액</span></legend>
         <div class="opts" id="f-fund"></div>
-        <input class="etc" id="fund-etc" type="text" maxlength="100" placeholder="250만원" hidden>
+        <input class="etc" id="fund-etc-text" type="text" maxlength="100" placeholder="250만원" hidden>
       </fieldset>
       <fieldset>
         <legend><span class="n">4</span>희망 여행지</legend>
         <div class="opts" id="f-dest"></div>
-        <input class="etc" id="dest-etc" type="text" maxlength="100" placeholder="태국 방콕, 필리핀 세부" hidden>
+        <input class="etc" id="dest-etc-text" type="text" maxlength="100" placeholder="태국 방콕, 필리핀 세부" hidden>
       </fieldset>
       <fieldset>
         <legend><span class="n">5</span>여권 유효기간<span class="hint">베트남은 6개월 이상 필요</span></legend>
@@ -256,9 +256,9 @@ th{color:var(--muted);font-size:12px}
   const getVals = n => [...document.querySelectorAll('input[name="' + n + '"]:checked')].map(e => e.value);
 
   function syncEtc(){
-    $("dates-etc").hidden = !getVals("dates").includes("etc");
-    $("fund-etc").hidden = getVal("fund") !== "etc";
-    $("dest-etc").hidden = getVal("dest") !== "etc";
+    $("dates-etc-text").hidden = !getVals("dates").includes("etc");
+    $("fund-etc-text").hidden = getVal("fund") !== "etc";
+    $("dest-etc-text").hidden = getVal("dest") !== "etc";
     const a = getVal("agree");
     $("dates-hint").textContent = a && a !== "yes" ? "선택사항 · 간다면 가능한 날" : "가능한 날 모두 선택";
   }
@@ -277,16 +277,16 @@ th{color:var(--muted);font-size:12px}
 
   function fill(d){
     document.querySelectorAll("#vote input").forEach(e => { if (e.type === "radio" || e.type === "checkbox") e.checked = false; });
-    if (!d){ ["dates-etc","fund-etc","dest-etc","f-memo"].forEach(id => $(id).value = ""); syncEtc(); return; }
+    if (!d){ ["dates-etc-text","fund-etc-text","dest-etc-text","f-memo"].forEach(id => $(id).value = ""); syncEtc(); return; }
     const set = (n, v) => { const e = document.getElementById(n + "-" + v); if (e) e.checked = true; };
     if (d.agree) set("agree", d.agree);
     (d.dates || []).forEach(v => set("dates", v));
     if (d.fund) set("fund", d.fund);
     if (d.dest) set("dest", d.dest);
     if (d.pass) set("pass", d.pass);
-    $("dates-etc").value = d.datesEtc || "";
-    $("fund-etc").value = d.fundEtc || "";
-    $("dest-etc").value = d.destEtc || "";
+    $("dates-etc-text").value = d.datesEtc || "";
+    $("fund-etc-text").value = d.fundEtc || "";
+    $("dest-etc-text").value = d.destEtc || "";
     $("f-memo").value = d.memo || "";
     syncEtc();
   }
@@ -369,9 +369,9 @@ th{color:var(--muted);font-size:12px}
     const t = id => $(id).value.trim().slice(0, 100);
     const d = {
       agree: getVal("agree"), dates: getVals("dates"), fund: getVal("fund"), dest: getVal("dest"), pass: getVal("pass"),
-      datesEtc: getVals("dates").includes("etc") ? t("dates-etc") : "",
-      fundEtc: getVal("fund") === "etc" ? t("fund-etc") : "",
-      destEtc: getVal("dest") === "etc" ? t("dest-etc") : "",
+      datesEtc: getVals("dates").includes("etc") ? t("dates-etc-text") : "",
+      fundEtc: getVal("fund") === "etc" ? t("fund-etc-text") : "",
+      destEtc: getVal("dest") === "etc" ? t("dest-etc-text") : "",
       memo: $("f-memo").value.trim().slice(0, 500)
     };
     const miss = [];
