@@ -127,12 +127,13 @@ th{color:var(--muted);font-size:12px}
       <legend>본인 이름을 고르세요</legend>
       <div class="opts" id="f-name"></div>
     </fieldset>
-    <fieldset>
-      <legend>PIN 4자리<span class="hint">개인톡으로 받은 번호</span></legend>
+    <fieldset id="fs-pin" hidden>
+      <legend><span id="pin-title">PIN 4자리</span><span class="hint" id="pin-hint"></span></legend>
       <input class="etc pin" id="f-pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="••••">
+      <input class="etc pin" id="f-pin2" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="한 번 더" hidden>
     </fieldset>
     <div id="loginmsg" hidden></div>
-    <button type="submit" class="btn" id="loginbtn">들어가기</button>
+    <button type="submit" class="btn" id="loginbtn" hidden>들어가기</button>
   </form>
 
   <!-- 2단계: 투표 -->
@@ -214,12 +215,17 @@ th{color:var(--muted);font-size:12px}
     if (!r.ok){
       const m = (j && j.message) || "";
       if (m.includes("locked")) return {ok:false, error:"locked"};
+      if (m.includes("not_registered")) return {ok:false, error:"not_registered"};
       return {ok:false, error:"server"};
     }
     return j;
   }
   const ERR = {
-    bad_pin: "PIN이 맞지 않습니다. 개인톡으로 받은 4자리를 확인해 주세요.",
+    bad_pin: "PIN이 맞지 않습니다. 처음 등록한 4자리를 입력해 주세요. 잊으셨으면 박정용에게 초기화를 요청하세요.",
+    pin_format: "PIN은 숫자 4자리로 정해 주세요.",
+    already_registered: "방금 다른 기기에서 이 이름의 PIN이 등록되었습니다. 본인이 아니면 박정용에게 알려 주세요.",
+    not_registered: "PIN이 초기화되었습니다. 이름을 다시 골라 새 PIN을 등록해 주세요.",
+    self: "본인 PIN은 여기서 초기화할 수 없습니다.",
     locked: "PIN을 10번 틀려서 10분간 잠겼습니다. 잠시 후 다시 해주세요.",
     closed: "투표가 마감되었습니다.",
     not_admin: "결과는 관리자만 볼 수 있습니다.",
@@ -293,7 +299,11 @@ th{color:var(--muted);font-size:12px}
     $("loginbtn").disabled = true;
     const r = await rpc("vote_login", {p_name: name, p_pin: p}).catch(() => ({ok:false, error:"server"}));
     $("loginbtn").disabled = false;
-    if (!r.ok){ show($("loginmsg"), ERR[r.error] || ERR.server, "err"); store.set(null); return; }
+    if (!r.ok){
+      store.set(null);
+      if (r.error === "not_registered"){ $("login").hidden = false; $("main").hidden = true; onPickName(); return; }
+      show($("loginmsg"), ERR[r.error] || ERR.server, "err"); return;
+    }
     me = name; pin = p; closed = !!r.closed; isAdmin = !!r.is_admin;
     store.set({name, pin: p});
     $("login").hidden = true; $("main").hidden = false;
@@ -307,18 +317,52 @@ th{color:var(--muted);font-size:12px}
     showTab("vote");
   }
 
-  $("login").addEventListener("submit", ev => {
+  // 이름을 고르면 PIN 등록 여부에 따라 '등록' 또는 '들어가기' 화면
+  let mode = null; // "register" | "login"
+  async function onPickName(){
+    const name = getVal("name"); if (!name) return;
+    show($("loginmsg"), ""); $("f-pin").value = ""; $("f-pin2").value = "";
+    $("loginbtn").hidden = true; $("fs-pin").hidden = true;
+    const r = await rpc("vote_status", {p_name: name}).catch(() => ({ok:false, error:"server"}));
+    if (getVal("name") !== name) return;
+    if (!r.ok){ show($("loginmsg"), ERR[r.error] || ERR.server, "err"); return; }
+    mode = r.registered ? "login" : "register";
+    $("fs-pin").hidden = false; $("loginbtn").hidden = false;
+    $("f-pin2").hidden = mode !== "register";
+    if (mode === "register"){
+      $("pin-title").textContent = "처음 오셨네요 · PIN 정하기";
+      $("pin-hint").textContent = "숫자 4자리, 두 번 입력";
+      $("loginbtn").textContent = "PIN 등록하고 들어가기";
+    } else {
+      $("pin-title").textContent = "PIN 4자리";
+      $("pin-hint").textContent = "처음에 정한 번호";
+      $("loginbtn").textContent = "들어가기";
+    }
+    $("f-pin").focus();
+  }
+  $("f-name").addEventListener("change", onPickName);
+
+  $("login").addEventListener("submit", async ev => {
     ev.preventDefault();
     const name = getVal("name"), p = $("f-pin").value.trim();
     if (!name){ show($("loginmsg"), "이름을 골라 주세요.", "err"); return; }
     if (!/^\d{4}$/.test(p)){ show($("loginmsg"), "PIN 4자리 숫자를 입력해 주세요.", "err"); return; }
+    if (mode === "register"){
+      if ($("f-pin2").value.trim() !== p){ show($("loginmsg"), "두 번 입력한 PIN이 다릅니다. 다시 입력해 주세요.", "err"); return; }
+      $("loginbtn").disabled = true;
+      const r = await rpc("vote_register", {p_name: name, p_pin: p}).catch(() => ({ok:false, error:"server"}));
+      $("loginbtn").disabled = false;
+      if (!r.ok){ show($("loginmsg"), ERR[r.error] || ERR.server, "err"); if (r.error === "already_registered") onPickName(); return; }
+    }
     show($("loginmsg"), "");
     doLogin(name, p);
   });
-  $("logout").addEventListener("click", () => {
+  function logout(msg){
     store.set(null); me = pin = null; stopPoll();
-    $("main").hidden = true; $("login").hidden = false; $("f-pin").value = ""; show($("formmsg"), "");
-  });
+    $("main").hidden = true; $("login").hidden = false; $("f-pin").value = ""; $("f-pin2").value = ""; show($("formmsg"), "");
+    if (msg){ show($("loginmsg"), msg, "err"); onPickName().then(() => show($("loginmsg"), msg, "err")); }
+  }
+  $("logout").addEventListener("click", () => logout());
 
   $("vote").addEventListener("submit", async ev => {
     ev.preventDefault();
@@ -344,6 +388,7 @@ th{color:var(--muted);font-size:12px}
     const r = await rpc("vote_submit", {p_name: me, p_pin: pin, p_data: d}).catch(() => ({ok:false, error:"server"}));
     $("submit").disabled = false;
     if (r.ok){ show($("formmsg"), me + "님, 제출되었습니다. 마감 전까지 언제든 수정할 수 있습니다.", "ok"); show($("status"), ""); }
+    else if (r.error === "not_registered") logout(ERR.not_registered);
     else { show($("formmsg"), ERR[r.error] || ERR.server, "err"); if (r.error === "closed") lockForm(true); }
   });
 
@@ -362,8 +407,38 @@ th{color:var(--muted);font-size:12px}
 
   async function loadResults(){
     const r = await rpc("vote_results", {p_name: me, p_pin: pin}).catch(() => ({ok:false, error:"server"}));
+    if (r.error === "not_registered"){ logout(ERR.not_registered); return; }
     if (!r.ok){ const root = $("results"); root.textContent = ""; const m = h("div", "msg err", ERR[r.error] || ERR.server); root.append(m); return; }
     renderResults(r.votes || []);
+    renderPinCard(r.registered || []);
+  }
+
+  // 관리자: PIN 등록 현황과 초기화
+  let resetArm = null;
+  function renderPinCard(registered){
+    const sec = h("section", "card"); sec.append(h("h3", null, "PIN 등록 현황"));
+    sec.append(h("div", "cap", "남이 먼저 등록했거나 PIN을 잊은 사람은 초기화하면 다시 등록할 수 있습니다. 초기화해도 투표 내용은 남습니다."));
+    const box = h("div", "people");
+    NAMES.forEach(n => {
+      const reg = registered.includes(n);
+      const chip = h("span", "chip " + (reg ? "done" : "miss"), n + (reg ? " · 등록" : " · 미등록"));
+      box.append(chip);
+      if (reg && n !== me){
+        const b = h("button", "chip", resetArm === n ? "정말 초기화?" : "초기화");
+        b.type = "button"; b.style.cursor = "pointer"; b.style.font = "inherit"; b.style.fontSize = "12px";
+        if (resetArm === n){ b.style.background = "var(--bad)"; b.style.color = "#fff"; b.style.borderColor = "transparent"; }
+        b.addEventListener("click", async () => {
+          if (resetArm !== n){ resetArm = n; loadResults(); return; }
+          resetArm = null;
+          const r = await rpc("vote_reset_pin", {p_name: me, p_pin: pin, p_target: n}).catch(() => ({ok:false, error:"server"}));
+          if (!r.ok) alert(ERR[r.error] || ERR.server);
+          loadResults();
+        });
+        box.append(b);
+      }
+    });
+    sec.append(box);
+    $("results").append(sec);
   }
 
   function h(tag, cls, text){ const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
