@@ -74,7 +74,7 @@ textarea.etc{min-height:84px;resize:vertical}
 .pill.wait{background:var(--sun);color:var(--warn)}
 .meter{height:10px;background:var(--lotus-soft);border-radius:6px;position:relative;overflow:hidden}
 .meter i{position:absolute;inset:0 auto 0 0;background:var(--lotus)}
-.meter b{position:absolute;top:0;bottom:0;width:2px;background:var(--sea);left:60%}
+.meter b{position:absolute;top:0;bottom:0;width:2px;background:var(--sea);left:57.14%}
 .cap{font-size:12px;color:var(--muted)}
 .bars{display:flex;flex-direction:column;gap:9px}
 .bar{display:grid;grid-template-columns:minmax(0,1fr) 40px;gap:3px 10px;align-items:center}
@@ -199,7 +199,7 @@ th{color:var(--muted);font-size:12px}
   const FUND = [{v:"100",t:"100만원"},{v:"150",t:"150만원"},{v:"200",t:"200만원"},{v:"etc",t:"기타 (직접 입력)"}];
   const DEST = [{v:"danang",t:"다낭"},{v:"nhatrang",t:"나트랑"},{v:"phuquoc",t:"푸꾸옥"},{v:"etc",t:"기타 (직접 입력)"}];
   const PASS = [{v:"ok",t:"6개월 이상 남음"},{v:"renew",t:"갱신이 필요함"},{v:"check",t:"확인해 봐야 함"}];
-  const THRESHOLD = 0.6;
+  const NEED = 4; // 4명 이상 동의 시 진행
 
   const $ = id => document.getElementById(id);
   const lab = (arr, v) => (arr.find(o => o.v === v) || {}).t || "-";
@@ -402,15 +402,15 @@ th{color:var(--muted);font-size:12px}
     const no = list.filter(v => v.agree === "no");
     const rate = yes.length / total;
     const remaining = total - list.length;
-    const go = rate > THRESHOLD;
-    const canStillGo = (yes.length + remaining) / total > THRESHOLD;
+    const go = yes.length >= NEED;
+    const canStillGo = yes.length + remaining >= NEED;
 
     const vd = h("section", "card");
     const r1 = h("div", "row");
     r1.append(h("span", "big", yes.length + " / " + total + "명 동의"));
     r1.append(go ? h("span", "pill go", "진행 확정") : (remaining && canStillGo ? h("span", "pill wait", "집계 중") : h("span", "pill hold", "연기")));
     const mt = h("div", "meter"); const mi = h("i"); mi.style.width = (rate * 100) + "%"; mt.append(mi, h("b"));
-    vd.append(r1, mt, h("div", "cap", "동의율 " + Math.round(rate * 100) + "% · 60% 초과(5명 이상)면 진행 · 반대 " + no.length + "명 · 내년(50세) 연기 " + next.length + "명"));
+    vd.append(r1, mt, h("div", "cap", "동의율 " + Math.round(rate * 100) + "% · 4명 이상 동의하면 진행 · 반대 " + no.length + "명 · 내년(50세) 연기 " + next.length + "명"));
     const ppl = h("div", "people");
     NAMES.forEach(n => ppl.append(h("span", "chip " + (by[n] ? "done" : "miss"), n + (by[n] ? " ✓" : " · 미응답"))));
     vd.append(h("div", "cap", "응답 " + list.length + "명 / 미응답 " + remaining + "명 · 30초마다 자동 갱신"), ppl);
