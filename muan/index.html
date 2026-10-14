@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache">
+<title>무안영우회 여행 투표</title>
+<meta property="og:title" content="무안영우회 해외여행 투표">
+<meta property="og:description" content="11월 2주차 베트남 여행 — 본인 이름과 PIN으로 들어와 투표해 주세요">
+<meta name="theme-color" content="#f0997b">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Brush+Script&family=Gowun+Dodum&display=swap">
+<style>
+:root{
+  --sky1:#f9d3bf; --sky2:#f0997b; --sky3:#993556; --sea:#042c53;
+  --card:rgba(255,255,255,.92); --card-solid:#fffaf7;
+  --ink:#3b1222; --muted:#8a5a68; --line:#f2c6d3;
+  --lotus:#d4537e; --lotus-deep:#72243e; --lotus-soft:#fbeaf0;
+  --sun:#faeeda; --ok:#1d7a52; --warn:#9a6200; --bad:#b3363f;
+  --brush:"Nanum Brush Script","Gungsuh",cursive;
+  --body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{background:var(--sea)}
+body{margin:0;min-height:100vh;background:linear-gradient(180deg,var(--sky1) 0px,var(--sky2) 260px,var(--sky3) 620px,var(--sea) 1100px,var(--sea) 100%);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+[hidden]{display:none!important}
+.wrap{max-width:600px;margin:0 auto;padding-block:16px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+header{display:flex;flex-direction:column;gap:2px}
+header svg{width:100%;height:auto;display:block}
+h1{font-family:var(--brush);font-weight:400;font-size:clamp(56px,15vw,76px);line-height:.95;margin:4px 0 0;color:#fff;text-shadow:0 2px 0 rgba(114,36,62,.35)}
+.sub{color:#fff3ee;margin:0}
+.deadline{align-self:flex-start;margin-top:8px;background:rgba(255,255,255,.88);color:var(--lotus-deep);font-weight:700;font-size:13px;padding:3px 12px;border-radius:999px}
+.tabs{display:flex;gap:6px;background:rgba(255,255,255,.25);padding:4px;border-radius:12px}
+.tabs button{all:unset;cursor:pointer;flex:1;text-align:center;padding:8px 10px;font-weight:700;color:#fff;border-radius:9px}
+.tabs button[aria-selected="true"]{background:var(--card-solid);color:var(--lotus-deep)}
+.tabs button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+form{display:flex;flex-direction:column;gap:12px}
+fieldset{border:0;background:var(--card);border-radius:16px;margin:0;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0;box-shadow:0 6px 18px rgba(4,44,83,.12)}
+legend{float:left;width:100%;padding:0;font-weight:700;font-size:16px;display:flex;gap:10px;align-items:baseline}
+legend .n{font-family:var(--brush);font-size:30px;line-height:.6;color:var(--lotus);font-weight:400}
+legend .hint{font-weight:400;font-size:12px;color:var(--muted);margin-left:auto}
+.opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.opts.wide{grid-template-columns:1fr}
+.opt{position:relative}
+.opt input{position:absolute;opacity:0;pointer-events:none}
+.opt label{display:flex;flex-direction:column;gap:1px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;cursor:pointer;background:#fff;transition:border-color .15s,background .15s}
+.opt label small{color:var(--muted);font-size:12px}
+.opt input:checked+label{border-color:var(--lotus);background:var(--lotus-soft);color:var(--lotus-deep);box-shadow:inset 0 0 0 1px var(--lotus)}
+.opt input:focus-visible+label{outline:2px solid var(--lotus);outline-offset:2px}
+.opt input:disabled+label{opacity:.5;cursor:not-allowed}
+.etc{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;background:#fff;color:var(--ink)}
+textarea.etc{min-height:84px;resize:vertical}
+.etc:focus-visible{outline:2px solid var(--lotus)}
+.etc::placeholder{color:#b9919c}
+.pin{font-size:24px;letter-spacing:.5em;text-align:center;font-variant-numeric:tabular-nums}
+.btn{all:unset;cursor:pointer;text-align:center;background:var(--lotus);color:#fff;font-weight:700;font-size:17px;padding:14px;border-radius:14px;box-shadow:0 6px 16px rgba(114,36,62,.35)}
+.btn:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.btn[disabled]{opacity:.55;cursor:not-allowed}
+.link{all:unset;cursor:pointer;color:#fff3ee;font-size:13px;text-decoration:underline;align-self:center}
+.me{display:flex;justify-content:space-between;align-items:center;color:#fff;font-size:14px}
+.msg{padding:12px 14px;border-radius:12px;font-size:14px}
+.msg.ok{background:var(--card-solid);color:var(--ok)}
+.msg.err{background:var(--card-solid);color:var(--bad)}
+.msg.info{background:rgba(255,255,255,.8);color:var(--muted)}
+#results{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--card);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0;box-shadow:0 6px 18px rgba(4,44,83,.12)}
+.card h3{margin:0;font-size:16px}
+.row{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.big{font-family:var(--brush);font-size:44px;line-height:1;color:var(--lotus-deep)}
+.pill{font-weight:700;font-size:14px;padding:4px 12px;border-radius:999px}
+.pill.go{background:#e1f5ee;color:var(--ok)}
+.pill.hold{background:var(--lotus-soft);color:var(--bad)}
+.pill.wait{background:var(--sun);color:var(--warn)}
+.meter{height:10px;background:var(--lotus-soft);border-radius:6px;position:relative;overflow:hidden}
+.meter i{position:absolute;inset:0 auto 0 0;background:var(--lotus)}
+.meter b{position:absolute;top:0;bottom:0;width:2px;background:var(--sea);left:60%}
+.cap{font-size:12px;color:var(--muted)}
+.bars{display:flex;flex-direction:column;gap:9px}
+.bar{display:grid;grid-template-columns:minmax(0,1fr) 40px;gap:3px 10px;align-items:center}
+.bar .lab{font-size:14px;display:flex;gap:6px;align-items:center;min-width:0;flex-wrap:wrap}
+.bar .ct{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+.bar .track{grid-column:1/-1;height:8px;background:var(--lotus-soft);border-radius:5px;overflow:hidden}
+.bar .track i{display:block;height:100%;background:#f0997b;border-radius:5px}
+.bar.top .track i{background:var(--lotus)}
+.who{grid-column:1/-1;font-size:12px;color:var(--muted)}
+.tag{font-size:11px;font-weight:700;color:#fff;background:var(--lotus);padding:1px 8px;border-radius:999px}
+.etclist{display:flex;flex-direction:column;gap:4px;font-size:13px;border-top:1px dashed var(--line);padding-top:8px}
+.people{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:13px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);background:#fff}
+.chip.done{background:var(--lotus-soft);border-color:transparent;color:var(--lotus-deep)}
+.chip.miss{color:var(--muted)}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px;min-width:620px}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-size:12px}
+@media (prefers-reduced-motion:no-preference){.meter i,.bar .track i{transition:width .4s ease}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <svg viewBox="0 0 600 150" aria-hidden="true">
+      <circle cx="430" cy="108" r="46" fill="#faeeda" opacity=".92"/>
+      <circle cx="430" cy="108" r="64" fill="#faeeda" opacity=".18"/>
+      <path d="M150 150 L210 78 L248 112 L290 60 L350 150 Z" fill="#72243e" opacity=".55"/>
+      <path d="M300 150 L352 96 L392 132 L430 104 L480 150 Z" fill="#4b1528" opacity=".55"/>
+      <rect x="0" y="128" width="600" height="22" fill="#26215c" opacity=".45"/>
+      <path d="M380 136 h100 M400 142 h60" stroke="#faeeda" stroke-width="2" opacity=".5" stroke-linecap="round"/>
+      <g stroke="#3b1222" stroke-width="5" fill="none" stroke-linecap="round">
+        <path d="M70 150 Q74 96 92 58"/>
+        <path d="M92 58 q-30 -8 -48 12"/><path d="M92 58 q30 -12 50 6"/>
+        <path d="M92 58 q-12 -26 -36 -26"/><path d="M92 58 q16 -26 40 -22"/>
+        <path d="M92 58 q-2 -20 4 -34"/>
+        <path d="M545 150 Q538 112 520 86" stroke-width="4"/>
+        <path d="M520 86 q-24 -6 -38 10 M520 86 q22 -10 40 4 M520 86 q-8 -20 -28 -20 M520 86 q12 -20 30 -16" stroke-width="4"/>
+      </g>
+    </svg>
+    <h1>무안영우회</h1>
+    <p class="sub">11월 2주차, 베트남에서 만납시다.</p>
+    <span class="deadline" id="deadline">마감 · 오늘(10/14) 자정</span>
+  </header>
+
+  <!-- 1단계: 이름 + PIN -->
+  <form id="login" novalidate>
+    <fieldset>
+      <legend>본인 이름을 고르세요</legend>
+      <div class="opts" id="f-name"></div>
+    </fieldset>
+    <fieldset>
+      <legend>PIN 4자리<span class="hint">개인톡으로 받은 번호</span></legend>
+      <input class="etc pin" id="f-pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="••••">
+    </fieldset>
+    <div id="loginmsg" hidden></div>
+    <button type="submit" class="btn" id="loginbtn">들어가기</button>
+  </form>
+
+  <!-- 2단계: 투표 -->
+  <div id="main" hidden style="display:flex;flex-direction:column;gap:16px">
+    <div class="me"><span id="me"></span><button type="button" class="link" id="logout">다른 이름으로</button></div>
+    <nav class="tabs" id="tabs" hidden>
+      <button type="button" id="tab-vote" aria-selected="true">투표하기</button>
+      <button type="button" id="tab-res" aria-selected="false">결과 보기 (관리자)</button>
+    </nav>
+    <div id="status" hidden></div>
+
+    <form id="vote" novalidate>
+      <fieldset>
+        <legend><span class="n">1</span>올해 해외여행에 동의하십니까?</legend>
+        <div class="opts wide" id="f-agree"></div>
+      </fieldset>
+      <fieldset>
+        <legend><span class="n">2</span>가능한 일정<span class="hint" id="dates-hint">가능한 날 모두 선택</span></legend>
+        <div class="opts wide" id="f-dates"></div>
+        <input class="etc" id="dates-etc" type="text" maxlength="100" placeholder="11/10(화) ~ 11/13(금)이면 가능" hidden>
+      </fieldset>
+      <fieldset>
+        <legend><span class="n">3</span>계비 지원 금액<span class="hint">7명 전체 총액</span></legend>
+        <div class="opts" id="f-fund"></div>
+        <input class="etc" id="fund-etc" type="text" maxlength="100" placeholder="250만원" hidden>
+      </fieldset>
+      <fieldset>
+        <legend><span class="n">4</span>희망 여행지</legend>
+        <div class="opts" id="f-dest"></div>
+        <input class="etc" id="dest-etc" type="text" maxlength="100" placeholder="태국 방콕, 필리핀 세부" hidden>
+      </fieldset>
+      <fieldset>
+        <legend><span class="n">5</span>여권 유효기간<span class="hint">베트남은 6개월 이상 필요</span></legend>
+        <div class="opts wide" id="f-pass"></div>
+      </fieldset>
+      <fieldset>
+        <legend><span class="n">6</span>기타 의견</legend>
+        <textarea class="etc" id="f-memo" maxlength="500" placeholder="골프 일정 하루 넣었으면 좋겠습니다"></textarea>
+      </fieldset>
+      <div id="formmsg" hidden></div>
+      <button type="submit" class="btn" id="submit">제출하기</button>
+    </form>
+
+    <div id="results" hidden></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const API = "https://phucicguavodoluezcpt.supabase.co/rest/v1/rpc/";
+  const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBodWNpY2d1YXZvZG9sdWV6Y3B0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5NDQyNTksImV4cCI6MjEwNzUyMDI1OX0.-bXT_BzzoMapStL-kihzxyxcgZRRTU0d7wfatGLtI_g";
+  const NAMES = ["박정용","황경한","조성범","윤여진","설명수","석화석","김상봉"];
+  const AGREE = [
+    {v:"yes", t:"동의 — 올해 11월에 갑시다"},
+    {v:"no", t:"반대 — 이번엔 어렵습니다"},
+    {v:"next", t:"내년으로 — 50세 기념여행으로 미루자"}
+  ];
+  const DATES = [
+    {v:"d1", t:"11/11(수) ~ 11/14(토)", s:"3박 4일"},
+    {v:"d2", t:"11/12(목) ~ 11/15(일)", s:"3박 4일"},
+    {v:"d3", t:"11/11(수) ~ 11/15(일)", s:"4박 5일"},
+    {v:"etc", t:"기타 (직접 입력)"}
+  ];
+  const FUND = [{v:"100",t:"100만원"},{v:"150",t:"150만원"},{v:"200",t:"200만원"},{v:"etc",t:"기타 (직접 입력)"}];
+  const DEST = [{v:"danang",t:"다낭"},{v:"nhatrang",t:"나트랑"},{v:"phuquoc",t:"푸꾸옥"},{v:"etc",t:"기타 (직접 입력)"}];
+  const PASS = [{v:"ok",t:"6개월 이상 남음"},{v:"renew",t:"갱신이 필요함"},{v:"check",t:"확인해 봐야 함"}];
+  const THRESHOLD = 0.6;
+
+  const $ = id => document.getElementById(id);
+  const lab = (arr, v) => (arr.find(o => o.v === v) || {}).t || "-";
+
+  async function rpc(fn, args){
+    const r = await fetch(API + fn, {
+      method: "POST",
+      headers: {"apikey": KEY, "Authorization": "Bearer " + KEY, "Content-Type": "application/json"},
+      body: JSON.stringify(args)
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok){
+      const m = (j && j.message) || "";
+      if (m.includes("locked")) return {ok:false, error:"locked"};
+      return {ok:false, error:"server"};
+    }
+    return j;
+  }
+  const ERR = {
+    bad_pin: "PIN이 맞지 않습니다. 개인톡으로 받은 4자리를 확인해 주세요.",
+    locked: "PIN을 10번 틀려서 10분간 잠겼습니다. 잠시 후 다시 해주세요.",
+    closed: "투표가 마감되었습니다.",
+    not_admin: "결과는 관리자만 볼 수 있습니다.",
+    invalid: "입력 내용을 저장할 수 없습니다. 의견을 조금 줄여 주세요.",
+    server: "연결이 원활하지 않습니다. 잠시 후 다시 시도해 주세요."
+  };
+
+  function renderOpts(el, name, arr, type){
+    el.textContent = "";
+    arr.forEach(o => {
+      const w = document.createElement("div"); w.className = "opt";
+      const inp = document.createElement("input");
+      inp.type = type; inp.name = name; inp.value = o.v; inp.id = name + "-" + o.v;
+      const l = document.createElement("label"); l.htmlFor = inp.id;
+      const sp = document.createElement("span"); sp.textContent = o.t; l.append(sp);
+      if (o.s){ const sm = document.createElement("small"); sm.textContent = o.s; l.append(sm); }
+      w.append(inp, l); el.append(w);
+    });
+  }
+  renderOpts($("f-name"), "name", NAMES.map(n => ({v:n, t:n})), "radio");
+  renderOpts($("f-agree"), "agree", AGREE, "radio");
+  renderOpts($("f-dates"), "dates", DATES, "checkbox");
+  renderOpts($("f-fund"), "fund", FUND, "radio");
+  renderOpts($("f-dest"), "dest", DEST, "radio");
+  renderOpts($("f-pass"), "pass", PASS, "radio");
+
+  const getVal = n => { const e = document.querySelector('input[name="' + n + '"]:checked'); return e ? e.value : ""; };
+  const getVals = n => [...document.querySelectorAll('input[name="' + n + '"]:checked')].map(e => e.value);
+
+  function syncEtc(){
+    $("dates-etc").hidden = !getVals("dates").includes("etc");
+    $("fund-etc").hidden = getVal("fund") !== "etc";
+    $("dest-etc").hidden = getVal("dest") !== "etc";
+    const a = getVal("agree");
+    $("dates-hint").textContent = a && a !== "yes" ? "선택사항 · 간다면 가능한 날" : "가능한 날 모두 선택";
+  }
+  $("vote").addEventListener("change", syncEtc);
+
+  function show(el, text, kind){
+    if (!text){ el.hidden = true; return; }
+    el.hidden = false; el.className = "msg " + kind; el.textContent = text;
+  }
+
+  let me = null, pin = null, closed = false, isAdmin = false;
+  const store = {
+    get(){ try { return JSON.parse(sessionStorage.getItem("myw") || "null"); } catch(e){ return null; } },
+    set(v){ try { v ? sessionStorage.setItem("myw", JSON.stringify(v)) : sessionStorage.removeItem("myw"); } catch(e){} }
+  };
+
+  function fill(d){
+    document.querySelectorAll("#vote input").forEach(e => { if (e.type === "radio" || e.type === "checkbox") e.checked = false; });
+    if (!d){ ["dates-etc","fund-etc","dest-etc","f-memo"].forEach(id => $(id).value = ""); syncEtc(); return; }
+    const set = (n, v) => { const e = document.getElementById(n + "-" + v); if (e) e.checked = true; };
+    if (d.agree) set("agree", d.agree);
+    (d.dates || []).forEach(v => set("dates", v));
+    if (d.fund) set("fund", d.fund);
+    if (d.dest) set("dest", d.dest);
+    if (d.pass) set("pass", d.pass);
+    $("dates-etc").value = d.datesEtc || "";
+    $("fund-etc").value = d.fundEtc || "";
+    $("dest-etc").value = d.destEtc || "";
+    $("f-memo").value = d.memo || "";
+    syncEtc();
+  }
+  function lockForm(on){
+    document.querySelectorAll("#vote input, #vote textarea").forEach(e => e.disabled = on);
+    $("submit").disabled = on;
+  }
+
+  async function doLogin(name, p){
+    $("loginbtn").disabled = true;
+    const r = await rpc("vote_login", {p_name: name, p_pin: p}).catch(() => ({ok:false, error:"server"}));
+    $("loginbtn").disabled = false;
+    if (!r.ok){ show($("loginmsg"), ERR[r.error] || ERR.server, "err"); store.set(null); return; }
+    me = name; pin = p; closed = !!r.closed; isAdmin = !!r.is_admin;
+    store.set({name, pin: p});
+    $("login").hidden = true; $("main").hidden = false;
+    $("me").textContent = name + "님, 반갑습니다";
+    fill(r.vote);
+    lockForm(closed);
+    if (closed){ $("deadline").textContent = "투표 마감됨"; show($("status"), ERR.closed, "info"); }
+    else if (r.vote) show($("status"), "이미 제출하셨습니다. 수정 후 다시 제출하면 덮어씁니다.", "ok");
+    else show($("status"), "");
+    $("tabs").hidden = !isAdmin;
+    showTab("vote");
+  }
+
+  $("login").addEventListener("submit", ev => {
+    ev.preventDefault();
+    const name = getVal("name"), p = $("f-pin").value.trim();
+    if (!name){ show($("loginmsg"), "이름을 골라 주세요.", "err"); return; }
+    if (!/^\d{4}$/.test(p)){ show($("loginmsg"), "PIN 4자리 숫자를 입력해 주세요.", "err"); return; }
+    show($("loginmsg"), "");
+    doLogin(name, p);
+  });
+  $("logout").addEventListener("click", () => {
+    store.set(null); me = pin = null; stopPoll();
+    $("main").hidden = true; $("login").hidden = false; $("f-pin").value = ""; show($("formmsg"), "");
+  });
+
+  $("vote").addEventListener("submit", async ev => {
+    ev.preventDefault();
+    const t = id => $(id).value.trim().slice(0, 100);
+    const d = {
+      agree: getVal("agree"), dates: getVals("dates"), fund: getVal("fund"), dest: getVal("dest"), pass: getVal("pass"),
+      datesEtc: getVals("dates").includes("etc") ? t("dates-etc") : "",
+      fundEtc: getVal("fund") === "etc" ? t("fund-etc") : "",
+      destEtc: getVal("dest") === "etc" ? t("dest-etc") : "",
+      memo: $("f-memo").value.trim().slice(0, 500)
+    };
+    const miss = [];
+    if (!d.agree) miss.push("여행 동의");
+    if (d.agree === "yes" && !d.dates.length) miss.push("가능한 일정");
+    if (d.dates.includes("etc") && !d.datesEtc) miss.push("기타 일정 내용");
+    if (!d.fund) miss.push("계비 금액");
+    if (d.fund === "etc" && !d.fundEtc) miss.push("기타 금액 내용");
+    if (!d.dest) miss.push("여행지");
+    if (d.dest === "etc" && !d.destEtc) miss.push("기타 여행지 내용");
+    if (!d.pass) miss.push("여권");
+    if (miss.length){ show($("formmsg"), "다음 항목을 채워 주세요: " + miss.join(", "), "err"); return; }
+    $("submit").disabled = true;
+    const r = await rpc("vote_submit", {p_name: me, p_pin: pin, p_data: d}).catch(() => ({ok:false, error:"server"}));
+    $("submit").disabled = false;
+    if (r.ok){ show($("formmsg"), me + "님, 제출되었습니다. 마감 전까지 언제든 수정할 수 있습니다.", "ok"); show($("status"), ""); }
+    else { show($("formmsg"), ERR[r.error] || ERR.server, "err"); if (r.error === "closed") lockForm(true); }
+  });
+
+  let poll = null;
+  function stopPoll(){ if (poll){ clearInterval(poll); poll = null; } }
+  function showTab(which){
+    const res = which === "res";
+    $("tab-vote").setAttribute("aria-selected", String(!res));
+    $("tab-res").setAttribute("aria-selected", String(res));
+    $("vote").hidden = res; $("results").hidden = !res;
+    stopPoll();
+    if (res){ show($("status"), ""); loadResults(); poll = setInterval(loadResults, 30000); }
+  }
+  $("tab-vote").addEventListener("click", () => showTab("vote"));
+  $("tab-res").addEventListener("click", () => showTab("res"));
+
+  async function loadResults(){
+    const r = await rpc("vote_results", {p_name: me, p_pin: pin}).catch(() => ({ok:false, error:"server"}));
+    if (!r.ok){ const root = $("results"); root.textContent = ""; const m = h("div", "msg err", ERR[r.error] || ERR.server); root.append(m); return; }
+    renderResults(r.votes || []);
+  }
+
+  function h(tag, cls, text){ const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+  function barCard(title, arr, key, list, multi, etcKey){
+    const sec = h("section", "card"); sec.append(h("h3", null, title));
+    const counts = arr.map(o => ({o, who: list.filter(v => multi ? (v[key] || []).includes(o.v) : v[key] === o.v).map(v => v.name)}));
+    const max = Math.max(1, ...counts.map(c => c.who.length));
+    const topN = Math.max(0, ...counts.filter(c => c.o.v !== "etc").map(c => c.who.length));
+    const bars = h("div", "bars");
+    counts.forEach(({o, who}) => {
+      const isTop = topN > 0 && o.v !== "etc" && who.length === topN;
+      const b = h("div", "bar" + (isTop ? " top" : ""));
+      const l = h("div", "lab"); l.append(h("span", null, o.t + (o.s ? " · " + o.s : "")));
+      if (isTop) l.append(h("span", "tag", multi ? "추천" : "최다"));
+      const tr = h("div", "track"); const f = h("i"); f.style.width = (who.length / max * 100) + "%"; tr.append(f);
+      b.append(l, h("div", "ct", who.length + "명"), tr);
+      if (who.length) b.append(h("div", "who", who.join(", ")));
+      bars.append(b);
+    });
+    sec.append(bars);
+    if (etcKey){
+      const etc = list.filter(v => v[etcKey]);
+      if (etc.length){ const el = h("div", "etclist"); etc.forEach(v => el.append(h("div", null, v.name + " · " + v[etcKey]))); sec.append(el); }
+    }
+    return sec;
+  }
+
+  function renderResults(votes){
+    const root = $("results"); root.textContent = "";
+    const by = {}; votes.forEach(v => { if (v && v.name) by[v.name] = v; });
+    const list = NAMES.filter(n => by[n]).map(n => by[n]);
+    const total = NAMES.length;
+    const yes = list.filter(v => v.agree === "yes");
+    const next = list.filter(v => v.agree === "next");
+    const no = list.filter(v => v.agree === "no");
+    const rate = yes.length / total;
+    const remaining = total - list.length;
+    const go = rate > THRESHOLD;
+    const canStillGo = (yes.length + remaining) / total > THRESHOLD;
+
+    const vd = h("section", "card");
+    const r1 = h("div", "row");
+    r1.append(h("span", "big", yes.length + " / " + total + "명 동의"));
+    r1.append(go ? h("span", "pill go", "진행 확정") : (remaining && canStillGo ? h("span", "pill wait", "집계 중") : h("span", "pill hold", "연기")));
+    const mt = h("div", "meter"); const mi = h("i"); mi.style.width = (rate * 100) + "%"; mt.append(mi, h("b"));
+    vd.append(r1, mt, h("div", "cap", "동의율 " + Math.round(rate * 100) + "% · 60% 초과(5명 이상)면 진행 · 반대 " + no.length + "명 · 내년(50세) 연기 " + next.length + "명"));
+    const ppl = h("div", "people");
+    NAMES.forEach(n => ppl.append(h("span", "chip " + (by[n] ? "done" : "miss"), n + (by[n] ? " ✓" : " · 미응답"))));
+    vd.append(h("div", "cap", "응답 " + list.length + "명 / 미응답 " + remaining + "명 · 30초마다 자동 갱신"), ppl);
+    root.append(vd);
+
+    if (!list.length){ root.append(h("div", "msg info", "아직 제출한 사람이 없습니다. 응답이 들어오면 여기에 쌓입니다.")); return; }
+
+    root.append(barCard("일정 — 동의자 기준 가능 인원", DATES, "dates", yes.length ? yes : list, true, "datesEtc"));
+    root.append(barCard("계비 지원 총액", FUND, "fund", list, false, "fundEtc"));
+    root.append(barCard("희망 여행지", DEST, "dest", list, false, "destEtc"));
+
+    const issues = list.filter(v => v.pass !== "ok");
+    const ps = h("section", "card"); ps.append(h("h3", null, "여권 확인 필요"));
+    ps.append(issues.length ? h("div", null, issues.map(v => v.name + " (" + lab(PASS, v.pass) + ")").join(", ")) : h("div", "cap", "응답자 전원 6개월 이상 남았습니다."));
+    root.append(ps);
+
+    const memos = list.filter(v => v.memo);
+    const ms = h("section", "card"); ms.append(h("h3", null, "기타 의견"));
+    if (memos.length){ const el = h("div", "etclist"); el.style.borderTop = "0"; el.style.paddingTop = "0"; memos.forEach(v => el.append(h("div", null, v.name + " · " + v.memo))); ms.append(el); }
+    else ms.append(h("div", "cap", "아직 남긴 의견이 없습니다."));
+    root.append(ms);
+
+    const ts = h("section", "card"); ts.append(h("h3", null, "개별 응답"));
+    const wrap = h("div", "tablewrap"); const tb = h("table");
+    const thr = h("tr"); ["이름","동의","가능 일정","계비","여행지","여권"].forEach(t => thr.append(h("th", null, t)));
+    const thead = h("thead"); thead.append(thr); tb.append(thead);
+    const tbody = h("tbody");
+    const withEtc = (arr, v, etc) => v === "etc" ? "기타: " + (etc || "") : lab(arr, v);
+    list.forEach(v => {
+      const tr = h("tr");
+      const dates = (v.dates || []).map(d => d === "etc" ? "기타: " + (v.datesEtc || "") : lab(DATES, d)).join(" / ") || "-";
+      [v.name, lab(AGREE, v.agree).split(" — ")[0], dates, withEtc(FUND, v.fund, v.fundEtc), withEtc(DEST, v.dest, v.destEtc), lab(PASS, v.pass)]
+        .forEach(t => tr.append(h("td", null, t)));
+      tbody.append(tr);
+    });
+    tb.append(tbody); wrap.append(tb); ts.append(wrap); root.append(ts);
+  }
+
+  // 새로고침 시 자동 재접속
+  const saved = store.get();
+  if (saved && saved.name && saved.pin){
+    const e = document.getElementById("name-" + saved.name); if (e) e.checked = true;
+    doLogin(saved.name, saved.pin);
+  }
+})();
+</script>
+</body>
+</html>
